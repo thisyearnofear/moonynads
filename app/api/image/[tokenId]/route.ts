@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
 import { generateTokenSVG } from '@/lib/blockchain'
+import { PANTS } from '@/lib/pants'
 
-const FILES = ['moon', 'moon2', 'moon3', 'heart', 'lady', 'chudnovsky', 'headupbutt', 'hips', 'l', 'm', 'multi', 's', 'xl']
+const FILES = PANTS.map(p => p.id)
 
 export async function GET(
   request: NextRequest,
@@ -19,7 +20,7 @@ export async function GET(
       return new NextResponse('Token not found', { status: 404 })
     }
 
-    const artPath = path.join(process.cwd(), 'pants', `${filename}.txt`)
+    const artPath = path.join(process.cwd(), 'public', 'pants', `${filename}.txt`)
     const asciiContent = await fs.readFile(artPath, 'utf-8')
     const svg = generateTokenSVG(asciiContent, tokenId)
     

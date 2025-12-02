@@ -85,9 +85,9 @@ export function Moonverse() {
             🌌 MOONVERSE
           </h2>
           <p className="text-sm text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-            Discover the growing ecosystem of apps, tools, and experiences built around the{' '}
-            <span className="font-mono text-yellow-600">{M00NYNAD_TOKEN.symbol}</span> memetoken.
-            Join the lunar revolution and explore what the community is building!
+            Explore the expanding universe of apps and tools built around{' '}
+            <span className="font-mono text-yellow-600">{M00NYNAD_TOKEN.symbol}</span>.
+            Don't get left behind - discover what happens when great minds come together! 🍑
           </p>
         </div>
 
@@ -161,9 +161,9 @@ export function Moonverse() {
             Building in the Moonverse?
           </h3>
           <p className="text-sm text-foreground/70 mb-6 max-w-lg mx-auto">
-            Join the growing ecosystem of builders creating innovative experiences around{' '}
-            <span className="font-mono text-yellow-600">{M00NYNAD_TOKEN.symbol}</span>.
-            Share your project and connect with the community!
+            Ready to get behind the movement? Join builders creating experiences around{' '}
+            <span className="font-mono text-yellow-600">{M00NYNAD_TOKEN.symbol}</span> 
+            that really make an impression. Don't be cheeky - share your project!
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

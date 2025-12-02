@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "name": "Moonynads",
+  "iconUrl": "https://m00nynads.vercel.app/moonynadssquare.png",
+  "homeUrl": "https://m00nynads.vercel.app",
+  "imageUrl": "https://m00nynads.vercel.app/moonynadsbanner.png",
+  "buttonTitle": "🌙 Explore Gallery",
+  "splashImageUrl": "https://m00nynads.vercel.app/moonynadssquare.png", 
+  "splashBackgroundColor": "#0a0a0b",
+  "subtitle": "Token-Gated ASCII Art NFTs",
+  "description": "Collect unique lunar ASCII art NFTs through dynamic advent calendar drops on Monad blockchain",
+  "primaryCategory": "art-creativity",
+  "tags": ["nft", "ascii-art", "monad", "advent", "art", "m00nynad"],
+  "ogTitle": "Moonynads Gallery",
+  "ogDescription": "12 Days of lunar ASCII art NFTs with dynamic minting mechanics on Monad blockchain",
+  "ogImageUrl": "https://m00nynads.vercel.app/og-image.png"
+}

@@ -249,6 +249,9 @@ export default function Home() {
       </div>
       
       <Footer />
+      
+      {/* Easter Egg Effects */}
+      <SecretEffects />
     </main>
   )
 }

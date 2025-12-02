@@ -12,26 +12,66 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Moonynads - Onchain ASCII Art NFTs on Monad",
-  description: "Collect unique lunar ASCII art NFTs on Monad blockchain. 12 Days of Moonynads Advent Calendar featuring rare digital collectibles.",
-  generator: "Next.js",
+  title: 'Moonynads Gallery - Token-Gated ASCII Art NFTs',
+  description: 'Collect unique lunar ASCII art NFTs through dynamic advent calendar drops on Monad blockchain',
+  generator: 'Next.js',
+  keywords: 'NFT, ASCII art, Monad, blockchain, advent calendar, m00nynad, lunar art',
+  authors: [{ name: 'Moonynads Team' }],
+  creator: 'Moonynads',
+  publisher: 'Moonynads',
+  metadataBase: new URL('https://m00nynads.vercel.app'),
+  
+  // Open Graph for Farcaster & Social Media
   openGraph: {
-    title: "Moonynads Gallery",
-    description: "12 Days of lunar ASCII art NFTs with dynamic minting mechanics on Monad",
-    url: "https://m00nynads.vercel.app",
-    siteName: "Moonynads",
+    title: 'Moonynads Gallery',
+    description: '12 Days of lunar ASCII art NFTs with dynamic minting mechanics',
+    url: 'https://m00nynads.vercel.app',
+    siteName: 'Moonynads',
     images: [
       {
-        url: "/og-image.png",
+        url: '/moonynadsbanner.png',
+        width: 1200,
+        height: 400,
+        alt: 'Moonynads Banner'
+      },
+      {
+        url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: "Moonynads - ASCII Art NFT Gallery",
-      },
+        alt: 'Moonynads - Token-Gated ASCII Art NFTs'
+      }
     ],
-    type: "website",
+    locale: 'en_US',
+    type: 'website',
   },
+  
+  // Twitter Card
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Moonynads Gallery',
+    description: '12 Days of lunar ASCII art NFTs with dynamic minting mechanics',
+    creator: '@moonynads',
+    images: ['/moonynadsbanner.png'],
+  },
+  
+  // Farcaster Frame & Additional Meta Tags
+  other: {
+    'fc:frame': 'vNext',
+    'fc:frame:image': 'https://m00nynads.vercel.app/moonynadsbanner.png',
+    'fc:frame:image:aspect_ratio': '3:1',
+    'fc:frame:button:1': '🌙 Explore Gallery',
+    'fc:frame:button:1:action': 'link',
+    'fc:frame:button:1:target': 'https://m00nynads.vercel.app',
+    'og:image': '/moonynadsbanner.png',
+  },
+  
   icons: {
     icon: [
+      {
+        url: "/moonynadssquare.png",
+        sizes: "any",
+        type: "image/png",
+      },
       {
         url: "/icon-light-32x32.png",
         media: "(prefers-color-scheme: light)",
@@ -39,10 +79,6 @@ export const metadata: Metadata = {
       {
         url: "/icon-dark-32x32.png",
         media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
       },
     ],
     apple: "/apple-icon.png",

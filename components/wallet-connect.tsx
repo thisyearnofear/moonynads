@@ -23,7 +23,7 @@ export function WalletConnect() {
             onClick={switchToMonadNetwork}
             className="font-mono text-xs px-2 py-1 bg-orange-500 hover:bg-orange-600 text-white rounded transition-colors"
           >
-            Switch to Monad
+            Navigate to Monad
           </button>
         ) : (
           <div className="flex items-center gap-1">
@@ -36,7 +36,7 @@ export function WalletConnect() {
           onClick={() => disconnect()}
           className="font-mono text-xs px-2 py-1 border border-yellow-600/30 hover:border-yellow-600/70 rounded transition-colors"
         >
-          Disconnect
+          Depart
         </button>
       </div>
     )
@@ -48,7 +48,7 @@ export function WalletConnect() {
       disabled={isPending}
       className="font-mono text-xs px-3 py-1 bg-yellow-600 hover:bg-yellow-700 disabled:bg-yellow-400 text-white rounded transition-colors"
     >
-      {isPending ? 'Connecting...' : 'Connect Wallet'}
+      {isPending ? 'Aligning vault...' : 'Align Your Vault'}
     </button>
   )
 }

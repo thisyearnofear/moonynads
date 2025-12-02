@@ -9,8 +9,8 @@ interface FarcasterShareProps {
 }
 
 export function FarcasterShare({ 
-  title = "Check out Moonynads",
-  description = "A token-gated ASCII art NFT gallery with dynamic advent calendar mechanics on Monad blockchain 🌙",
+  title = "Moonynads - Lunar ASCII Art",
+  description = "A token-gated collection of lunar ASCII art with a progressive 12-day advent calendar on Monad blockchain 🌙",
   className = ""
 }: FarcasterShareProps) {
   const handleShare = async () => {
@@ -22,9 +22,9 @@ export function FarcasterShare({
     <button
       onClick={handleShare}
       className={`font-mono text-xs px-3 py-1 border border-purple-600 hover:bg-purple-600 hover:text-white text-purple-600 dark:text-purple-400 dark:border-purple-400 rounded transition-colors ${className}`}
-      title="Share on Farcaster"
+      title="Broadcast on Farcaster"
     >
-      💜 Share
+      💜 Broadcast
     </button>
   )
 }

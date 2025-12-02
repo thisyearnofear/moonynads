@@ -1,0 +1,22 @@
+{
+  "name": "Moonynads",
+  "short_name": "Moonynads",
+  "description": "Token-Gated ASCII Art NFTs on Monad blockchain",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#eab308",
+  "icons": [
+    {
+      "src": "/moonynadssquare.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

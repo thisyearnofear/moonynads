@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://m00nynads.vercel.app/sitemap.xml

@@ -1,0 +1,23 @@
+# Moonynads Gallery robots.txt
+User-agent: *
+Allow: /
+Allow: /moonynadsbanner.png
+Allow: /moonynadssquare.png
+Allow: /og-image.png
+Allow: /.well-known/farcaster.json
+
+# Allow social media crawlers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Disallow private routes
+Disallow: /.next/
+Disallow: /node_modules/
+
+Sitemap: https://m00nynads.vercel.app/sitemap.xml

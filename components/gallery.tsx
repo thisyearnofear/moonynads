@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { ASCIIHoverEffects } from "./ascii-hover-effects"
+import { PreviewBanner } from "./preview-banner"
 
 interface ArtPiece {
   id: string

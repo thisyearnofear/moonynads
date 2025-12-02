@@ -9,26 +9,20 @@
     "name": "Moonynads",
     "homeUrl": "https://m00nynads.vercel.app",
     "iconUrl": "https://m00nynads.vercel.app/icon.svg",
+    "imageUrl": "https://m00nynads.vercel.app/og-image.png",
+    "buttonTitle": "🌙 Gallery",
     "subtitle": "Token-Gated ASCII Art NFTs",
-    "description": "Collect unique lunar ASCII art NFTs through multi-mechanic advent calendar drops on Monad blockchain",
+    "description": "Collect unique lunar ASCII art NFTs through dynamic advent calendar drops on Monad blockchain",
     "primaryCategory": "art-creativity",
     "tags": ["nft", "ascii-art", "monad", "advent", "art"],
     "splashImageUrl": "https://m00nynads.vercel.app/icon.svg",
     "splashBackgroundColor": "#0a0a0b",
-    "heroImageUrl": "https://m00nynads.vercel.app/og-image.png",
     "ogTitle": "Moonynads Gallery",
     "ogDescription": "12 Days of lunar ASCII art NFTs with dynamic minting mechanics",
     "ogImageUrl": "https://m00nynads.vercel.app/og-image.png",
-    "screenshotUrls": [
-      "https://m00nynads.vercel.app/screenshot-1.png",
-      "https://m00nynads.vercel.app/screenshot-2.png",
-      "https://m00nynads.vercel.app/screenshot-3.png"
-    ],
-    "requiredChains": ["eip155:143"],
     "requiredCapabilities": [
-      "sdk.actions.ready",
-      "sdk.actions.composeCast",
-      "sdk.context.user"
+      "actions.ready",
+      "actions.composeCast"
     ]
   }
 }

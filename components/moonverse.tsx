@@ -91,8 +91,8 @@ export function Moonverse() {
           </p>
         </div>
 
-        {/* Apps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        {/* Apps Grid - 2x2 layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
           {MOONVERSE_APPS.map((app, index) => (
             <div
               key={app.name}
@@ -168,7 +168,7 @@ export function Moonverse() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href={`https://farcaster.xyz/~/channel/m00nynad`}
+              href={`https://farcaster.xyz/~/code/YKR2G8`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-mono rounded transition-colors"
@@ -177,12 +177,12 @@ export function Moonverse() {
             </a>
             
             <a
-              href={`https://twitter.com/search?q=%23m00nynad`}
+              href={`https://x.com/m00npapi`}
               target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-2 border border-yellow-600 hover:bg-yellow-600 hover:text-white text-yellow-600 text-sm font-mono rounded transition-colors"
             >
-              🐦 Follow on X
+              🐦 Follow Creator
             </a>
           </div>
         </div>

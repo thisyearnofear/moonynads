@@ -5,9 +5,9 @@ import Gallery from "@/components/gallery"
 import AdventCalendar from "@/components/advent-calendar"
 import Hero from "@/components/hero"
 import { Footer } from "@/components/footer"
-import { MemetokenBanner } from "@/components/memetoken-banner"
 import { Moonverse } from "@/components/moonverse"
 import { MoonverseNav } from "@/components/moonverse-nav"
+import { TokenGate } from "@/components/token-gate"
 
 interface ArtPiece {
   id: string
@@ -197,8 +197,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
-      <MemetokenBanner />
-      
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="mb-12">
@@ -206,10 +204,6 @@ export default function Home() {
           
           {/* Navigation */}
           <div className="flex justify-center items-center gap-4 mt-6">
-            <div className="font-mono text-xs px-3 py-1 bg-yellow-600 text-white rounded">
-              Web3 Coming Soon
-            </div>
-            <span className="text-yellow-600/30">•</span>
             <MoonverseNav />
           </div>
         </section>
@@ -243,7 +237,11 @@ export default function Home() {
             COMPLETE COLLECTION
           </h2>
           
-          <Gallery artPieces={artPieces} />
+          <TokenGate 
+            fallback={<AdventCalendar artPieces={artPieces} currentDate={currentDate} />}
+          >
+            <Gallery artPieces={artPieces} />
+          </TokenGate>
         </section>
       </div>
 

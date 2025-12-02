@@ -1,3 +1,7 @@
+'use client'
+
+import { WalletConnect } from './wallet-connect'
+
 interface HeroProps {
   data: {
     title: string
@@ -7,8 +11,14 @@ interface HeroProps {
 
 export default function Hero({ data }: HeroProps) {
   return (
-    <section className="container mx-auto px-4 py-12 md:py-18 relative">
-      <div className="flex flex-col items-center justify-center gap-6 md:gap-8">
+    <section className="relative">
+      {/* Wallet Connect Button - Top Right */}
+      <div className="absolute top-0 right-0">
+        <WalletConnect />
+      </div>
+
+      <div className="container mx-auto px-4 py-12 md:py-18">
+        <div className="flex flex-col items-center justify-center gap-6 md:gap-8">
         {/* ASCII Art Header - Complex but clean */}
         <div className="font-mono leading-4 md:leading-5 text-center overflow-x-auto">
           <pre className="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[11px] text-yellow-600 dark:text-yellow-500">
@@ -35,6 +45,7 @@ export default function Hero({ data }: HeroProps) {
             {data.title}
           </h1>
         </div>
+      </div>
       </div>
     </section>
   )

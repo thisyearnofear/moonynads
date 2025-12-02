@@ -56,8 +56,10 @@ export function useEasterEggs() {
     • Click the moon 10 times - Get handsy with it
     • Type "gmMoon()" - Developer backdoor access
     • SHIFT+Click ASCII art - See what's underneath  
+    • Click "Chain ..." in footer - View tokenomics
     • Visit /secret-moon - For the truly committed
     
+    💰 Sales: 80% burned, 10% platform, 10% airdrops
     🪙 m00nynad contract: ${typeof window !== 'undefined' ? '0x22cd99ec337a2811f594340a4a6e41e4a3022b07' : 'Loading...'}
     
     Built with 💚 (and a sense of humor) for the Moonverse

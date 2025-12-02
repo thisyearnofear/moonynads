@@ -1,13 +1,23 @@
 'use client'
 
+import { useState } from 'react'
 import { CONFIG, M00NYNAD_TOKEN } from '@/lib/blockchain'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
+  const [showTokenomics, setShowTokenomics] = useState(false)
 
   return (
     <footer className="border-t border-yellow-600/20 bg-background/50 backdrop-blur-sm">
       <div className="container mx-auto px-4 py-6">
+        {/* Tokenomics info - hidden by default, revealed on hover/click */}
+        {showTokenomics && (
+          <div className="mb-4 p-3 bg-yellow-900/20 border border-yellow-600/30 rounded text-xs font-mono text-yellow-700 dark:text-yellow-300 leading-relaxed">
+            <div className="font-bold mb-2">💰 Sales Distribution</div>
+            <div>80% burned • 10% platform • 10% airdrops</div>
+          </div>
+        )}
+        
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-foreground/60 font-mono">
           
           {/* Left side - Copyright and branding */}
@@ -38,7 +48,13 @@ export function Footer() {
               MonadVision
             </a>
             <span className="text-yellow-600/30">•</span>
-            <span>Chain {CONFIG.network.chainId}</span>
+            <button
+              onClick={() => setShowTokenomics(!showTokenomics)}
+              className="hover:text-yellow-500 transition-colors cursor-pointer"
+              title="View tokenomics"
+            >
+              Chain {CONFIG.network.chainId}
+            </button>
           </div>
         </div>
       </div>

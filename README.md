@@ -14,10 +14,25 @@ Moonynads Gallery is an interactive web application that displays a curated coll
 
 ## 🎨 Features
 
+### Animation Labs (`/pants`)
+- Browse 12 unique ASCII animation designs with interactive controls
+- Real-time animation preview with 7 animation modes (lineWave, blockSway, colorCycle, glitch, etc.)
+- 4-color palette selection (yellow, green, blue, rainbow)
+- Speed and amplitude controls for fine-tuned animations
+- Target character/set highlighting for focus effects
+- **Persistent state**: Animation settings auto-saved per design in localStorage
+- **Recording**: Capture animations as WebM video with customizable FPS
+- **Upload**: Save snapshots (PNG) or animations (WebM) with metadata to Grove storage
+
+### Storage Integration
+- Multi-provider storage abstraction (Grove + Local fallback)
+- Animation settings captured with every upload for reproducibility
+- Metadata persistence for animation recreation
+
 ### Main Gallery
-- Browse all 12 Moonynads with their descriptions and rarity levels
-- Search functionality to find specific art pieces
-- Click on any Moonynad to view it in full detail
+- Discover all 12 Moonynads from the listing page (`/pants`)
+- Browse with rarity badges (Common, Uncommon, Rare, Epic, Legendary)
+- Direct access to each design's animation lab
 - Responsive design that works on all devices
 
 ### 🎄 Advent Calendar (Seasonal Feature)
@@ -54,13 +69,28 @@ npm run start
 ## 📁 Project Structure
 ```
 moonynads/
-├── app/                  # Next.js app pages
-├── components/          # React components
-│   ├── gallery.tsx       # Main gallery component
-│   └── advent-calendar.tsx # Advent calendar component
-├── pants/                # ASCII art files
-├── public/               # Static assets
-└── package.json          # Project configuration
+├── app/                  # Next.js app routes
+│   ├── api/
+│   │   ├── storage/      # File upload handler
+│   │   ├── image/        # NFT image generation
+│   │   └── metadata/     # NFT metadata API
+│   └── pants/            # Animation labs
+│       ├── page.tsx      # Listing page
+│       └── [id]/         # Individual lab
+├── components/           # React components
+│   ├── ascii-animator.tsx # Main animation component
+│   └── ...other components
+├── hooks/                # Custom React hooks
+│   ├── useAnimationState.ts      # localStorage persistence
+│   ├── useAnimationRecorder.ts   # Canvas recording
+│   └── useAnimationUpload.ts     # Upload + validation
+├── lib/
+│   ├── pants.ts          # Pants catalog
+│   ├── storage/          # Storage providers (Grove, Local)
+│   └── ...other utilities
+├── public/
+│   └── pants/            # ASCII animation frames
+└── package.json          # Project dependencies
 ```
 
 ## 🎨 ASCII Art Collection

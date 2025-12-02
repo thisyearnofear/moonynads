@@ -212,6 +212,54 @@ forge verify-contract <CONTRACT_ADDRESS> src/Moonynads.sol:Moonynads \
 - **Styling**: Tailwind CSS with custom monospace fonts
 - **Web3**: Wagmi + Viem for Monad integration
 - **State Management**: React hooks and context
+- **Storage**: Grove (IPFS) + Local file upload
+
+### Animation Labs Architecture
+
+#### Custom Hooks (Separation of Concerns)
+
+1. **useAnimationState** (`hooks/useAnimationState.ts`)
+   - Manages animation settings (mode, palette, speed, amplitude, gradient, targeting)
+   - Auto-persists to localStorage per pants ID
+   - Provides getSettings() for upload payloads
+   - Hydration-safe with isHydrated flag
+
+2. **useAnimationRecorder** (`hooks/useAnimationRecorder.ts`)
+   - Canvas stream capture and MediaRecorder setup
+   - WebM blob generation with configurable FPS/duration
+   - Memory cleanup (object URL revocation)
+   - No UI dependencies—purely business logic
+
+3. **useAnimationUpload** (`hooks/useAnimationUpload.ts`)
+   - Form validation (file size, settings structure)
+   - Error handling with typed error objects
+   - Loading states during upload
+   - Centralized fetch to `/api/storage/upload`
+
+#### Storage System
+
+**Provider Interface** (`lib/storage/provider.ts`)
+```typescript
+interface StorageProvider {
+  put(opts: {
+    bytes: Uint8Array
+    filename: string
+    contentType?: string
+    animationSettings?: AnimationSettings
+  }): Promise<StoreResult>
+}
+```
+
+**Implementations:**
+- **Grove** (`lib/storage/grove.ts`): IPFS storage via https://api.grove.storage
+- **Local** (`lib/storage/local.ts`): Fallback to public/uploads with .meta.json
+
+#### Component Design
+
+- **ascii-animator.tsx**: Pure presentation layer using hooks
+- Reduced from 540→520 LOC through hook extraction
+- No business logic; all state/uploads managed by hooks
+- Canvas rendering, recording UI, upload buttons only
 
 ### Key Components
 
@@ -220,6 +268,7 @@ forge verify-contract <CONTRACT_ADDRESS> src/Moonynads.sol:Moonynads \
 3. **Token Gating**: `components/token-gate.tsx`, `hooks/use-token-balance.ts`
 4. **NFT Gallery**: `components/gallery.tsx`, `lib/contracts.ts`
 5. **Tier System**: `lib/tier-system.ts`, `hooks/use-advent-access.ts`
+6. **Animation Labs**: `components/ascii-animator.tsx`, `hooks/useAnimation*.ts`
 
 ### Environment Variables
 
@@ -302,6 +351,14 @@ npm run test
 
 ## 📊 Future Enhancements
 
+### Animation Labs
+
+- Multi-frame batch upload with animation settings
+- Preset animation templates (common mode/palette combinations)
+- Share animation as shareable preview link with embedded settings
+- Animation history/gallery per user
+- Community featured animations leaderboard
+
 ### Tier System
 
 - Animated moon phase transitions
@@ -315,6 +372,8 @@ npm run test
 - Custom error tracking
 - Performance optimization
 - Additional blockchain integrations
+- WebM to NFT metadata linkage
+- Import animations from Grove uploads as NFT metadata
 
 ### Design
 
@@ -326,6 +385,7 @@ npm run test
 ---
 
 **Last Updated**: December 2024
-**Documentation Version**: 1.0
+**Documentation Version**: 1.1
 **Next.js Version**: 15.5.6
 **Monad Chain ID**: 143
+**Latest Feature**: Animation Labs with localStorage persistence and Grove storage integration

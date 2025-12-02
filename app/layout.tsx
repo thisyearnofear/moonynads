@@ -65,19 +65,10 @@ export const metadata: Metadata = {
     icon: [
       {
         url: "/moonynadssquare.png",
-        sizes: "any",
+        sizes: "1024x1024",
         type: "image/png",
       },
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
     ],
-    apple: "/apple-icon.png",
   },
   
   // Farcaster Mini App Manifest

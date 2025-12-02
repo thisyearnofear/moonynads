@@ -27,7 +27,7 @@ export const MINIAPP_METADATA = {
 export const MINIAPP_OPENGRAPH = {
   ogTitle: 'Moonynads Gallery',
   ogDescription: '12 Days of lunar ASCII art NFTs with dynamic minting mechanics',
-  ogImageUrl: 'https://m00nynads.vercel.app/og-image.png', // 1200x630 PNG
+  ogImageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png', // 1200x630 PNG
 } as const
 
 /**

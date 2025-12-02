@@ -30,16 +30,10 @@ export const metadata: Metadata = {
     siteName: MINIAPP_CONFIG.name,
     images: [
       {
-        url: MINIAPP_CONFIG.imageUrl,
+        url: MINIAPP_OPENGRAPH.ogImageUrl,
         width: 1200,
         height: 630,
-        alt: `${MINIAPP_CONFIG.name} Banner`
-      },
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: `${MINIAPP_CONFIG.name} - ${MINIAPP_METADATA.subtitle}`
+        alt: `${MINIAPP_CONFIG.name} Gallery`
       }
     ],
     locale: 'en_US',

@@ -7,10 +7,10 @@ export const MINIAPP_CONFIG = {
   version: '1',
   name: 'Moonynads',
   homeUrl: 'https://m00nynads.vercel.app',
-  iconUrl: 'https://m00nynads.vercel.app/moonynadssquare.png',
-  imageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png',
+  iconUrl: 'https://m00nynads.vercel.app/moonynadssquare.png', // 1024x1024 PNG
+  imageUrl: 'https://m00nynads.vercel.app/moonynad-embed.png', // 1200x800 (3:2 ratio)
   buttonTitle: '🌙 Explore Gallery',
-  splashImageUrl: 'https://m00nynads.vercel.app/moonynadssquare.png',
+  splashImageUrl: 'https://m00nynads.vercel.app/moonynad-splash.png', // 200x200 PNG
   splashBackgroundColor: '#0a0a0b',
 } as const
 
@@ -20,14 +20,14 @@ export const MINIAPP_METADATA = {
   tagline: '12 Days of lunar NFTs',
   primaryCategory: 'art-creativity' as const,
   tags: ['nft', 'ascii-art', 'monad', 'advent', 'art'],
-  heroImageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png',
+  heroImageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png', // 1200x630 PNG
   screenshotUrls: ['https://m00nynads.vercel.app/moonynadsbanner.png'],
 } as const
 
 export const MINIAPP_OPENGRAPH = {
   ogTitle: 'Moonynads Gallery',
   ogDescription: '12 Days of lunar ASCII art NFTs with dynamic minting mechanics',
-  ogImageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png',
+  ogImageUrl: 'https://m00nynads.vercel.app/og-image.png', // 1200x630 PNG
 } as const
 
 /**

@@ -12,16 +12,21 @@ export function FarcasterProvider({ children }: { children: React.ReactNode }) {
         const { sdk } = await import('@farcaster/miniapp-sdk')
         // Call ready after app loads - will be called after content is rendered
         await sdk.actions.ready()
+        console.log('Farcaster SDK ready called')
       } catch (error) {
         // Not running in Farcaster context, which is fine for local testing
-        console.log('Farcaster SDK not available (running in browser context)')
+        console.log('Farcaster SDK not available (running in browser context)', error)
       }
     }
 
-    // Add a small delay to ensure DOM is ready before calling ready()
-    const timer = setTimeout(initFarcaster, 100)
-    
-    return () => clearTimeout(timer)
+    // Wait longer for content to load before calling ready()
+    // Use requestIdleCallback for better timing, or fallback to longer timeout
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => initFarcaster(), { timeout: 3000 })
+    } else {
+      const timer = setTimeout(initFarcaster, 2000)
+      return () => clearTimeout(timer)
+    }
   }, [])
 
   useEffect(() => {

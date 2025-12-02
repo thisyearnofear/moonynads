@@ -145,6 +145,17 @@ export default function Home() {
 
         setArtPieces(loadedPieces)
         setLoading(false)
+
+        // Call Farcaster SDK ready after content is loaded
+        if (typeof window !== 'undefined') {
+          try {
+            const { sdk } = await import('@farcaster/miniapp-sdk')
+            await sdk.actions.ready()
+          } catch (error) {
+            // Not in Farcaster context, that's fine
+            console.log('Not running in Farcaster Mini App context')
+          }
+        }
       } catch (err) {
         setError("Failed to load Moonynads gallery")
         setLoading(false)

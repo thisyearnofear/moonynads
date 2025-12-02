@@ -8,6 +8,7 @@ import { Footer } from "@/components/footer"
 import { Moonverse } from "@/components/moonverse"
 import { MoonverseNav } from "@/components/moonverse-nav"
 import { TokenGate } from "@/components/token-gate"
+import { SecretEffects } from "@/components/secret-effects"
 
 interface ArtPiece {
   id: string

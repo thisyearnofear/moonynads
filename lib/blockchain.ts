@@ -81,6 +81,23 @@ export const M00NYNAD_TOKEN = {
   name: 'm00nad'
 } as const
 
+// Advent calendar unlock thresholds (in tokens)
+// Days 13-24 progressively unlock with increasing token requirements
+export const ADVENT_UNLOCK_THRESHOLDS = {
+  13: 250_000_000,   // 250M - Crescent Holder tier begins
+  14: 350_000_000,   // 350M
+  15: 450_000_000,   // 450M
+  16: 550_000_000,   // 550M - Half Moon tier
+  17: 650_000_000,   // 650M
+  18: 750_000_000,   // 750M
+  19: 850_000_000,   // 850M - Waxing Collector tier
+  20: 950_000_000,   // 950M
+  21: 1_050_000_000, // 1.05B
+  22: 1_150_000_000, // 1.15B - Lunatic Elite tier
+  23: 1_250_000_000, // 1.25B
+  24: 1_350_000_000  // 1.35B - Celestial Whale (complete access)
+} as const
+
 // Network switching utilities
 export const NETWORK_CONFIG = {
   chainId: `0x${CONFIG.network.chainId.toString(16)}`, // 0x8F for 143

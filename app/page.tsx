@@ -237,9 +237,7 @@ export default function Home() {
             COMPLETE COLLECTION
           </h2>
           
-          <TokenGate 
-            fallback={<AdventCalendar artPieces={artPieces} currentDate={currentDate} />}
-          >
+          <TokenGate>
             <Gallery artPieces={artPieces} />
           </TokenGate>
         </section>

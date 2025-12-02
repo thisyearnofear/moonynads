@@ -73,12 +73,12 @@ ${lines.map((line, i) => `    <tspan x="${padding}" dy="${i === 0 ? 0 : charHeig
 </svg>`
 }
 
-// m00nynad memetoken configuration
+// m00nad memetoken configuration
 export const M00NYNAD_TOKEN = {
   address: '0x22cd99ec337a2811f594340a4a6e41e4a3022b07',
-  symbol: 'M00NYNAD',
+  symbol: 'm00nad',
   decimals: 18,
-  name: 'M00nynad'
+  name: 'm00nad'
 } as const
 
 // Network switching utilities

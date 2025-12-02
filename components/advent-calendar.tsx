@@ -74,6 +74,22 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
     24: 11   // s
   }
 
+  // Subtle mechanics hints for each day
+  const dayMechanicsHints: Record<number, { emoji: string; hint: string }> = {
+    13: { emoji: '⚡', hint: 'First come, first served' },
+    14: { emoji: '📉', hint: 'Price discovery mode' },
+    15: { emoji: '🎰', hint: 'Randomness awaits' },
+    16: { emoji: '🎮', hint: 'Leaderboard mechanics' },
+    17: { emoji: '📱', hint: 'Social engagement bonus' },
+    18: { emoji: '🏆', hint: 'Competitive bidding' },
+    19: { emoji: '🤝', hint: 'Community challenge' },
+    20: { emoji: '⭐', hint: 'Creator recognition' },
+    21: { emoji: '💎', hint: 'Exclusive tier' },
+    22: { emoji: '🎁', hint: 'Mystery revealed' },
+    23: { emoji: '🌊', hint: 'Unlimited opportunity' },
+    24: { emoji: '🌙', hint: 'Finale celebration' }
+  }
+
   const getArtForDay = (day: number): ArtPiece | null => {
     if (!artPieces.length) return null
     const index = dayToArtMap[day] ?? day % artPieces.length
@@ -138,37 +154,52 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
         }
       `}</style>
 
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
-        {adventDays.map((day) => {
-          const isUnlocked = day <= availableDays
-          const isSelected = selectedDay === day
-          const isUnlockedButNotSelected = unlockedDays.includes(day) && !isSelected
-          const isToday = day === currentDayOfMonth
+      <div className="space-y-6">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
+          {adventDays.map((day) => {
+            const isUnlocked = day <= availableDays
+            const isSelected = selectedDay === day
+            const isUnlockedButNotSelected = unlockedDays.includes(day) && !isSelected
+            const isToday = day === currentDayOfMonth
+            const hint = dayMechanicsHints[day]
 
-          return (
-            <button
-              key={day}
-              onClick={() => handleDayClick(day)}
-              disabled={!isUnlocked}
-              className={`aspect-square flex flex-col items-center justify-center rounded border-2 transition-all duration-200 font-mono text-sm font-bold
-                ${isUnlocked
-                  ? isToday
-                    ? 'border-yellow-500 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30'
-                    : isSelected
-                    ? 'border-yellow-600 bg-yellow-500/40 text-yellow-700 dark:text-yellow-300 shadow-md shadow-yellow-500/20'
-                    : isUnlockedButNotSelected
-                    ? 'border-yellow-400/50 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:border-yellow-400 hover:bg-yellow-500/20'
-                    : 'border-yellow-400/30 bg-yellow-500/5 text-yellow-600 dark:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-500/15'
-                  : 'border-gray-600/30 bg-gray-700/10 text-gray-500 cursor-not-allowed opacity-40'
-                }
-              `}
-            >
-              <div className="text-xs opacity-75">DAY</div>
-              <div className="text-lg leading-tight">{day}</div>
-              {isUnlockedButNotSelected && <div className="text-xs mt-0.5">✓</div>}
-            </button>
-          )
-        })}
+            return (
+              <div key={day} className="flex flex-col items-center gap-1 group">
+                <button
+                  onClick={() => handleDayClick(day)}
+                  disabled={!isUnlocked}
+                  className={`w-full aspect-square flex flex-col items-center justify-center rounded border-2 transition-all duration-200 font-mono text-sm font-bold
+                    ${isUnlocked
+                      ? isToday
+                        ? 'border-yellow-500 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30'
+                        : isSelected
+                        ? 'border-yellow-600 bg-yellow-500/40 text-yellow-700 dark:text-yellow-300 shadow-md shadow-yellow-500/20'
+                        : isUnlockedButNotSelected
+                        ? 'border-yellow-400/50 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:border-yellow-400 hover:bg-yellow-500/20'
+                        : 'border-yellow-400/30 bg-yellow-500/5 text-yellow-600 dark:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-500/15'
+                      : 'border-gray-600/30 bg-gray-700/10 text-gray-500 cursor-not-allowed opacity-40'
+                    }
+                  `}
+                >
+                  <div className="text-xs opacity-75">DAY</div>
+                  <div className="text-lg leading-tight">{day}</div>
+                  {isUnlockedButNotSelected && <div className="text-xs mt-0.5">✓</div>}
+                </button>
+                {/* Easter egg hint - only show on unlocked days as subtle tooltip */}
+                {isUnlocked && hint && (
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-center">
+                    <div className="text-xs text-yellow-600/70 dark:text-yellow-500/70">
+                      {hint.emoji}
+                    </div>
+                    <div className="text-[10px] text-yellow-600/50 dark:text-yellow-500/50 whitespace-nowrap px-1">
+                      {hint.hint}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* Modal for selected day */}

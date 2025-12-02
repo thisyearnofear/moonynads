@@ -25,11 +25,10 @@ export function TokenGate({ children, fallback, requiredAmount = 250_000_000 }: 
             Token-Gated Collection
           </h3>
           <p className="text-sm text-foreground/70 leading-relaxed">
-            Connect your wallet and hold <span className="font-mono text-yellow-600">250M+ {M00NYNAD_TOKEN.symbol}</span> tokens 
-            to access the complete collection.
+            Connect your wallet holding <span className="font-mono text-yellow-600">250M+ {M00NYNAD_TOKEN.symbol}</span> to view the complete collection.
           </p>
           <p className="text-xs text-foreground/50">
-            Otherwise, discover new art daily through our advent calendar!
+            Each piece unlocks when you meet the balance requirement before its advent day.
           </p>
           <div className="pt-4">
             <WalletConnect />
@@ -78,11 +77,11 @@ export function TokenGate({ children, fallback, requiredAmount = 250_000_000 }: 
               You have <span className="font-mono text-yellow-600">{formatted} {M00NYNAD_TOKEN.symbol}</span>
             </p>
             <p>
-              Need <span className="font-mono text-yellow-600">{formatShortfall(shortfall)} more</span> to access the complete collection
+              Need <span className="font-mono text-yellow-600">{formatShortfall(shortfall)} more</span> to view the complete collection
             </p>
           </div>
           <p className="text-xs text-foreground/50">
-            Don't worry! You can still collect NFTs daily through our advent calendar.
+            Each piece becomes viewable when you reach the 250M balance before its advent day launch.
           </p>
           <div className="pt-4 border-t border-yellow-600/20 space-y-2">
             <a

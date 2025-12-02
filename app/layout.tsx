@@ -83,6 +83,9 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
+  
+  // Farcaster Mini App Manifest
+  manifest: '/.well-known/farcaster.json',
 }
 
 export default function RootLayout({

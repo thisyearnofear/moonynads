@@ -27,7 +27,8 @@
     "ogImageUrl": "https://m00nynads.vercel.app/moonynadsbanner.png",
     "requiredCapabilities": [
       "actions.ready",
-      "actions.composeCast"
+      "actions.composeCast",
+      "wallet.getEthereumProvider"
     ]
   }
 }

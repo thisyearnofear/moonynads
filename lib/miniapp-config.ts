@@ -67,7 +67,7 @@ export function generateManifest(accountAssociation: object) {
       splashBackgroundColor: MINIAPP_CONFIG.splashBackgroundColor,
       ...MINIAPP_METADATA,
       ...MINIAPP_OPENGRAPH,
-      requiredCapabilities: ['actions.ready', 'actions.composeCast'],
+      requiredCapabilities: ['actions.ready', 'actions.composeCast', 'wallet.getEthereumProvider'],
     },
   }
 }

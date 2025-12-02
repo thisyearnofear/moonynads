@@ -1,4 +1,5 @@
 import { http, createConfig } from 'wagmi'
+import { farcasterMiniApp as miniAppConnector } from '@farcaster/miniapp-wagmi-connector'
 import { defineChain } from 'viem'
 import { CONFIG } from './contracts'
 
@@ -14,6 +15,7 @@ const monad = defineChain({
 export const config = createConfig({
   chains: [monad],
   transports: { [monad.id]: http(CONFIG.network.rpc) },
+  connectors: [miniAppConnector()],
 })
 
 declare module 'wagmi' {

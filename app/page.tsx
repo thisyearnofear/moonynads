@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Gallery from "@/components/gallery"
 import AdventCalendar from "@/components/advent-calendar"
+import Hero from "@/components/hero"
 
 interface ArtPiece {
   id: string
@@ -17,6 +18,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [isAdventModalOpen, setIsAdventModalOpen] = useState(false)
 
   useEffect(() => {
     const loadArtPieces = async () => {
@@ -192,18 +194,16 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-4 text-primary">
-          🌙 MOONYNADS GALLERY 🌙
-        </h1>
-        <p className="text-center mb-2 text-muted-foreground">
-          A Collection of Lunar ASCII Art NFTs
-        </p>
+        {/* Hero Section */}
+        <section className="mb-12">
+          <Hero data={{ title: "MOONYNADS GALLERY", subtitle: "ASCII ART COLLECTION" }} />
+        </section>
 
         {isChristmasSeason && (
-          <div className="text-center mb-8 text-sm text-accent">
-            <p>🎄 {daysUntilChristmas} days until Christmas! 🎄</p>
-            <p className="text-xs text-muted-foreground">
-              Check out our special 12 Days of Moonynads Advent Calendar below!
+          <div className="text-center mb-8 space-y-1">
+            <p className="font-mono text-sm text-yellow-700 dark:text-yellow-600 font-bold">🎄 {Math.ceil(daysUntilChristmas)} days until Christmas! 🎄</p>
+            <p className="font-mono text-xs text-foreground/60">
+              Unlock special moon art with our 12 Days of Moonynads Advent Calendar
             </p>
           </div>
         )}
@@ -211,25 +211,21 @@ export default function Home() {
         {/* Advent Calendar Section */}
         {isChristmasSeason && (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-center mb-6 text-primary">
-              <span className="text-accent">╔════════════════════════════════════════════════╗</span>
-              <br />
-              <span className="text-primary">║ 12 DAYS OF MOONYNADS ADVENT CALENDAR ║</span>
-              <br />
-              <span className="text-accent">╚════════════════════════════════════════════════╝</span>
+            <h2 className="text-xl md:text-2xl font-bold text-center mb-8 text-yellow-700 dark:text-yellow-500 font-mono">
+              12 DAYS OF MOONYNADS
             </h2>
-            <AdventCalendar artPieces={artPieces} currentDate={currentDate} />
+            <AdventCalendar 
+              artPieces={artPieces} 
+              currentDate={currentDate}
+              onModalStateChange={setIsAdventModalOpen}
+            />
           </section>
         )}
 
-        {/* Main Gallery Section */}
-        <section>
-          <h2 className="text-2xl font-bold text-center mb-6 text-primary">
-            <span className="text-accent">╔════════════════════════════════════════════════╗</span>
-            <br />
-            <span className="text-primary">║ COMPLETE MOONYNADS COLLECTION ║</span>
-            <br />
-            <span className="text-accent">╚════════════════════════════════════════════════╝</span>
+        {/* Main Gallery Section - hidden when advent modal is open */}
+        <section className={isAdventModalOpen ? 'hidden' : ''}>
+          <h2 className="text-xl md:text-2xl font-bold text-center mb-8 text-yellow-700 dark:text-yellow-500 font-mono">
+            COMPLETE COLLECTION
           </h2>
           <Gallery artPieces={artPieces} />
         </section>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface ArtPiece {
   id: string
@@ -13,18 +13,24 @@ interface ArtPiece {
 interface AdventCalendarProps {
   artPieces: ArtPiece[]
   currentDate: Date
+  onModalStateChange?: (isOpen: boolean) => void
 }
 
-export default function AdventCalendar({ artPieces, currentDate }: AdventCalendarProps) {
+export default function AdventCalendar({ artPieces, currentDate, onModalStateChange }: AdventCalendarProps) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [unlockedDays, setUnlockedDays] = useState<number[]>([])
+  const [showConfetti, setShowConfetti] = useState(false)
+  
+  // In development, allow all days to be clickable
+  const isDevelopment = typeof window !== 'undefined' && process.env.NODE_ENV === 'development'
 
   // Calculate which days should be unlocked based on current date
   const currentDayOfMonth = currentDate.getDate()
   const currentMonth = currentDate.getMonth() // 11 = December
 
   // For December, unlock days 1 through current day (up to day 24)
-  const availableDays = currentMonth === 11 ? Math.min(currentDayOfMonth, 24) : 0
+  // In development, allow all days
+  const availableDays = isDevelopment ? 24 : (currentMonth === 11 ? Math.min(currentDayOfMonth, 24) : 0)
 
   // Generate the 12 days advent calendar (days 13-24 for Christmas countdown)
   const adventDays = Array.from({ length: 12 }, (_, i) => i + 13)
@@ -35,24 +41,53 @@ export default function AdventCalendar({ artPieces, currentDate }: AdventCalenda
       // Mark as unlocked if not already
       if (!unlockedDays.includes(day)) {
         setUnlockedDays([...unlockedDays, day])
+        setShowConfetti(true)
+        // Hide confetti after animation
+        setTimeout(() => setShowConfetti(false), 2000)
       }
     }
   }
 
   const handleCloseModal = () => {
     setSelectedDay(null)
+    onModalStateChange?.(false)
+  }
+  
+  // Notify parent when modal opens
+  useEffect(() => {
+    onModalStateChange?.(selectedDay !== null)
+  }, [selectedDay, onModalStateChange])
+
+  // Map days to specific art pieces
+  const dayToArtMap: Record<number, number> = {
+    13: 0,   // moon
+    14: 1,   // moon2
+    15: 2,   // moon3
+    16: 3,   // heart
+    17: 4,   // lady
+    18: 5,   // chudnovsky
+    19: 6,   // headupbutt
+    20: 7,   // hips
+    21: 8,   // l
+    22: 9,   // m
+    23: 10,  // multi
+    24: 11   // s
   }
 
-  // Get a random art piece for the selected day
   const getArtForDay = (day: number): ArtPiece | null => {
     if (!artPieces.length) return null
-
-    // Use day number to seed the selection for consistency
-    const seed = day % artPieces.length
-    return artPieces[seed]
+    const index = dayToArtMap[day] ?? day % artPieces.length
+    return artPieces[index]
   }
 
   const selectedArt = selectedDay ? getArtForDay(selectedDay) : null
+  
+  // Debug logging in development
+  if (typeof window !== 'undefined' && isDevelopment) {
+    if (selectedDay && !selectedArt) {
+      console.warn(`No art found for day ${selectedDay}. Art pieces available:`, artPieces.length)
+    }
+  }
 
   // Rarity colors
   const getRarityColor = (rarity: string) => {
@@ -67,45 +102,82 @@ export default function AdventCalendar({ artPieces, currentDate }: AdventCalenda
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-8">
+    <div className="max-w-4xl mx-auto relative">
+      {/* Confetti effect */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          {Array.from({ length: 30 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: '-10px',
+                animation: `confetti-fall 2s ease-out forwards`,
+                animationDelay: `${i * 40}ms`,
+                background: ['#d4af37', '#ffd700', '#ffed4e', '#eab308', '#fbbf24'][Math.floor(Math.random() * 5)],
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%'
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      <style>{`
+        @keyframes confetti-fall {
+          0% {
+            opacity: 1;
+            transform: translateY(0) translateX(0) rotate(0deg);
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(600px) translateX(${(Math.random() - 0.5) * 150}px) rotate(720deg);
+          }
+        }
+      `}</style>
+
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-3">
         {adventDays.map((day) => {
           const isUnlocked = day <= availableDays
           const isSelected = selectedDay === day
           const isUnlockedButNotSelected = unlockedDays.includes(day) && !isSelected
+          const isToday = day === currentDayOfMonth
 
           return (
-            <div
+            <button
               key={day}
-              className={`aspect-square p-2 border-2 rounded-lg flex items-center justify-center cursor-pointer transition-all duration-300
-                ${isUnlocked
-                  ? 'border-accent bg-card/50 hover:bg-accent/10'
-                  : 'border-border bg-card/30 cursor-not-allowed'
-                }
-                ${isSelected ? 'ring-2 ring-ring' : ''}
-                ${isUnlockedButNotSelected ? 'opacity-70' : ''}
-              `}
               onClick={() => handleDayClick(day)}
+              disabled={!isUnlocked}
+              className={`aspect-square flex flex-col items-center justify-center rounded border-2 transition-all duration-200 font-mono text-sm font-bold
+                ${isUnlocked
+                  ? isToday
+                    ? 'border-yellow-500 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30'
+                    : isSelected
+                    ? 'border-yellow-600 bg-yellow-500/40 text-yellow-700 dark:text-yellow-300 shadow-md shadow-yellow-500/20'
+                    : isUnlockedButNotSelected
+                    ? 'border-yellow-400/50 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 hover:border-yellow-400 hover:bg-yellow-500/20'
+                    : 'border-yellow-400/30 bg-yellow-500/5 text-yellow-600 dark:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-500/15'
+                  : 'border-gray-600/30 bg-gray-700/10 text-gray-500 cursor-not-allowed opacity-40'
+                }
+              `}
             >
-              <div className="text-center font-mono">
-                <div className={`text-xs ${isUnlocked ? 'text-accent' : 'text-border'}`}>DAY</div>
-                <div className={`text-lg font-bold ${isUnlocked ? 'text-foreground' : 'text-muted-foreground'}`}>{day}</div>
-                {isUnlockedButNotSelected && (
-                  <div className="text-xs text-accent mt-1">✓</div>
-                )}
-              </div>
-            </div>
+              <div className="text-xs opacity-75">DAY</div>
+              <div className="text-lg leading-tight">{day}</div>
+              {isUnlockedButNotSelected && <div className="text-xs mt-0.5">✓</div>}
+            </button>
           )
         })}
       </div>
 
       {/* Modal for selected day */}
       {selectedDay && selectedArt && (
-        <div className="fixed inset-0 bg-background/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 fade-in-modal">
-          <div className="bg-card p-6 md:p-8 rounded-lg border border-border max-w-2xl w-full max-h-[90vh] overflow-auto relative">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-card border-2 border-yellow-600/50 rounded-lg p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-auto relative shadow-xl">
             <button
               onClick={handleCloseModal}
-              className="absolute top-4 right-4 text-destructive hover:text-destructive-foreground transition-colors"
+              className="absolute top-4 right-4 text-yellow-600 hover:text-yellow-500 transition-colors"
               aria-label="Close"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,36 +185,39 @@ export default function AdventCalendar({ artPieces, currentDate }: AdventCalenda
               </svg>
             </button>
 
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-primary mb-2">🎄 DAY {selectedDay} 🎄</h2>
-              <div className="font-mono text-sm text-muted-foreground mb-4">
+            <div className="text-center mb-6 space-y-3">
+              <div className="font-mono text-sm text-yellow-600 dark:text-yellow-500 font-bold">
+                🎄 DAY {selectedDay} UNLOCKED 🎄
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-yellow-700 dark:text-yellow-500">
+                {selectedArt.name}
+              </h2>
+              <div className="font-mono text-xs text-yellow-600/70 dark:text-yellow-600">
                 {currentDate.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
+                  weekday: 'short',
+                  month: 'short',
                   day: 'numeric'
                 })}
               </div>
 
-              <div className="border-t border-border pt-4">
-                <h3 className="text-xl font-semibold text-foreground mb-2">{selectedArt.name}</h3>
-                <div className={`text-sm ${getRarityColor(selectedArt.rarity)} font-mono`}>
-                  ■ Rarity: {selectedArt.rarity.toUpperCase()}
+              <div className="border-t border-yellow-600/30 pt-4">
+                <div className={`text-sm font-mono font-bold ${getRarityColor(selectedArt.rarity)}`}>
+                  {selectedArt.rarity.toUpperCase()}
                 </div>
               </div>
             </div>
 
-            <div className="ascii-art-full font-mono text-accent whitespace-pre overflow-auto mb-6 p-4 bg-background/20 rounded">
-              {selectedArt.content}
+            <div className="text-center mb-6">
+              <div className="ascii-art-full font-mono text-foreground whitespace-pre overflow-auto p-4 bg-background/50 border border-yellow-600/20 rounded text-xs md:text-sm max-h-64 inline-block">
+                {selectedArt.content}
+              </div>
             </div>
 
-            <div className="border-t border-border pt-4">
-              <p className="text-muted-foreground text-sm mb-4">{selectedArt.description}</p>
-
-              <div className="text-xs text-muted-foreground/70">
-                <p>🌙 Moonynad #{selectedArt.id.toUpperCase()}</p>
-                <p>🎁 Limited Edition Christmas Drop</p>
-                <p>📅 {currentDate.getFullYear()} Advent Calendar Collection</p>
+            <div className="border-t border-yellow-600/30 pt-4 space-y-3 text-center">
+              <p className="text-sm text-foreground">{selectedArt.description}</p>
+              <div className="text-xs text-foreground/70 space-y-1 font-mono">
+                <p>Moonynad #{selectedArt.id.toUpperCase()}</p>
+                <p>Limited Edition Christmas Drop • {currentDate.getFullYear()}</p>
               </div>
             </div>
           </div>

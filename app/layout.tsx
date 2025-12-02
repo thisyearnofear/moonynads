@@ -51,14 +51,9 @@ export const metadata: Metadata = {
   
   // Farcaster Frame & Additional Meta Tags
   other: {
-    'fc:frame': 'vNext',
-    'fc:frame:image': MINIAPP_CONFIG.imageUrl,
-    'fc:frame:image:aspect_ratio': '3:2',
-    'fc:frame:button:1': MINIAPP_CONFIG.buttonTitle,
-    'fc:frame:button:1:action': 'link',
-    'fc:frame:button:1:target': MINIAPP_CONFIG.homeUrl,
     'og:image': MINIAPP_CONFIG.imageUrl,
-    'fc:miniapp': JSON.stringify(generateMiniAppEmbed())
+    'fc:miniapp': JSON.stringify(generateMiniAppEmbed()),
+    'fc:frame': JSON.stringify(generateMiniAppEmbed())
   },
   
   icons: {

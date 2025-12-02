@@ -40,7 +40,7 @@ export function generateMiniAppEmbed() {
     button: {
       title: MINIAPP_CONFIG.buttonTitle,
       action: {
-        type: 'launch_miniapp',
+        type: 'launch_frame',
         name: MINIAPP_CONFIG.name,
         url: MINIAPP_CONFIG.homeUrl,
         splashImageUrl: MINIAPP_CONFIG.splashImageUrl,

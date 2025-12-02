@@ -22,10 +22,11 @@ const METADATA = [
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { tokenId: string } }
+  { params }: { params: Promise<{ tokenId: string }> }
 ) {
   try {
-    const tokenId = parseInt(params.tokenId)
+    const resolvedParams = await params
+    const tokenId = parseInt(resolvedParams.tokenId)
     const baseTokenId = tokenId > 1000 ? Math.floor(tokenId / 1000) : tokenId
     const baseMetadata = METADATA[baseTokenId - 1] // Array is 0-indexed
     

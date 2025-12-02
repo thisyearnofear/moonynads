@@ -5,10 +5,34 @@ import { formatUnits } from 'viem'
 import { M00NYNAD_TOKEN } from '@/lib/blockchain'
 
 const ERC20_ABI = [
-  'function balanceOf(address owner) view returns (uint256)',
-  'function decimals() view returns (uint8)',
-  'function symbol() view returns (string)',
-  'function name() view returns (string)'
+  {
+    inputs: [{ name: 'owner', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', type: 'uint256' }],
+    type: 'function',
+    stateMutability: 'view'
+  },
+  {
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', type: 'uint8' }],
+    type: 'function',
+    stateMutability: 'view'
+  },
+  {
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function',
+    stateMutability: 'view'
+  },
+  {
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', type: 'string' }],
+    type: 'function',
+    stateMutability: 'view'
+  }
 ] as const
 
 export function useTokenBalance(address?: string) {
@@ -22,7 +46,7 @@ export function useTokenBalance(address?: string) {
 
   // Convert balance from wei to readable format
   const balanceFormatted = balance 
-    ? parseFloat(formatUnits(balance, M00NYNAD_TOKEN.decimals))
+    ? parseFloat(formatUnits(BigInt(balance.toString()), M00NYNAD_TOKEN.decimals))
     : 0
 
   // Check if user has required amount (250M tokens)

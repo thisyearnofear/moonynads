@@ -4,6 +4,7 @@ import { JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Web3Provider } from "@/components/web3-provider"
 import { FarcasterProvider } from "@/components/farcaster-provider"
+import { MINIAPP_CONFIG, MINIAPP_METADATA, MINIAPP_OPENGRAPH, generateMiniAppEmbed } from "@/lib/miniapp-config"
 import "./globals.css"
 
 const jetbrainsMono = JetBrains_Mono({
@@ -12,33 +13,33 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Moonynads Gallery - Token-Gated ASCII Art NFTs',
-  description: 'Collect unique lunar ASCII art NFTs through dynamic advent calendar drops on Monad blockchain',
+  title: `${MINIAPP_CONFIG.name} Gallery - ${MINIAPP_METADATA.subtitle}`,
+  description: MINIAPP_METADATA.description,
   generator: 'Next.js',
   keywords: 'NFT, ASCII art, Monad, blockchain, advent calendar, m00nynad, lunar art',
   authors: [{ name: 'Moonynads Team' }],
-  creator: 'Moonynads',
-  publisher: 'Moonynads',
-  metadataBase: new URL('https://m00nynads.vercel.app'),
+  creator: MINIAPP_CONFIG.name,
+  publisher: MINIAPP_CONFIG.name,
+  metadataBase: new URL(MINIAPP_CONFIG.homeUrl),
   
   // Open Graph for Farcaster & Social Media
   openGraph: {
-    title: 'Moonynads Gallery',
-    description: '12 Days of lunar ASCII art NFTs with dynamic minting mechanics',
-    url: 'https://m00nynads.vercel.app',
-    siteName: 'Moonynads',
+    title: MINIAPP_OPENGRAPH.ogTitle,
+    description: MINIAPP_OPENGRAPH.ogDescription,
+    url: MINIAPP_CONFIG.homeUrl,
+    siteName: MINIAPP_CONFIG.name,
     images: [
       {
-        url: '/moonynadsbanner.png',
+        url: MINIAPP_CONFIG.imageUrl,
         width: 1200,
-        height: 400,
-        alt: 'Moonynads Banner'
+        height: 630,
+        alt: `${MINIAPP_CONFIG.name} Banner`
       },
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Moonynads - Token-Gated ASCII Art NFTs'
+        alt: `${MINIAPP_CONFIG.name} - ${MINIAPP_METADATA.subtitle}`
       }
     ],
     locale: 'en_US',
@@ -48,35 +49,22 @@ export const metadata: Metadata = {
   // Twitter Card
   twitter: {
     card: 'summary_large_image',
-    title: 'Moonynads Gallery',
-    description: '12 Days of lunar ASCII art NFTs with dynamic minting mechanics',
+    title: MINIAPP_OPENGRAPH.ogTitle,
+    description: MINIAPP_OPENGRAPH.ogDescription,
     creator: '@moonynads',
-    images: ['/moonynadsbanner.png'],
+    images: [MINIAPP_CONFIG.imageUrl],
   },
   
   // Farcaster Frame & Additional Meta Tags
   other: {
     'fc:frame': 'vNext',
-    'fc:frame:image': 'https://m00nynads.vercel.app/moonynadsbanner.png',
-    'fc:frame:image:aspect_ratio': '3:1',
-    'fc:frame:button:1': '🌙 Explore Gallery',
+    'fc:frame:image': MINIAPP_CONFIG.imageUrl,
+    'fc:frame:image:aspect_ratio': '3:2',
+    'fc:frame:button:1': MINIAPP_CONFIG.buttonTitle,
     'fc:frame:button:1:action': 'link',
-    'fc:frame:button:1:target': 'https://m00nynads.vercel.app',
-    'og:image': '/moonynadsbanner.png',
-    'fc:miniapp': JSON.stringify({
-      version: '1',
-      imageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png',
-      button: {
-        title: '🌙 Explore Gallery',
-        action: {
-          type: 'launch_frame',
-          name: 'Moonynads',
-          url: 'https://m00nynads.vercel.app',
-          splashImageUrl: 'https://m00nynads.vercel.app/moonynadssquare.png',
-          splashBackgroundColor: '#0a0a0b'
-        }
-      }
-    })
+    'fc:frame:button:1:target': MINIAPP_CONFIG.homeUrl,
+    'og:image': MINIAPP_CONFIG.imageUrl,
+    'fc:miniapp': JSON.stringify(generateMiniAppEmbed())
   },
   
   icons: {

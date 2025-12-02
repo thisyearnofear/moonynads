@@ -1,35 +1,35 @@
 'use client'
 
 import { useEffect } from 'react'
-import { initFarcasterSDK } from '@/lib/farcaster'
+import { generateMiniAppEmbed } from '@/lib/miniapp-config'
 
 export function FarcasterProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Initialize Farcaster SDK if running in Farcaster context
-    initFarcasterSDK().catch(err => {
-      console.log('Farcaster SDK not available (running in browser context)')
-    })
-
-    // Add Farcaster mini app embed meta tag
-    const miniappEmbed = {
-      version: '1',
-      imageUrl: 'https://m00nynads.vercel.app/og-image.png',
-      button: {
-        title: '🌙 View Gallery',
-        action: {
-          type: 'launch_frame',
-          name: 'Moonynads',
-          url: 'https://m00nynads.vercel.app',
-          splashImageUrl: 'https://m00nynads.vercel.app/icon.svg',
-          splashBackgroundColor: '#0a0a0b'
-        }
+    // Call sdk.actions.ready() when the app is ready to display
+    // This hides the splash screen and tells Farcaster the mini app is loaded
+    const initFarcaster = async () => {
+      try {
+        const { sdk } = await import('@farcaster/miniapp-sdk')
+        // Call ready after app loads - will be called after content is rendered
+        await sdk.actions.ready()
+      } catch (error) {
+        // Not running in Farcaster context, which is fine for local testing
+        console.log('Farcaster SDK not available (running in browser context)')
       }
     }
 
-    // Inject meta tag if it doesn't exist
-    if (!document.querySelector('meta[property="fc:miniapp"]')) {
+    // Add a small delay to ensure DOM is ready before calling ready()
+    const timer = setTimeout(initFarcaster, 100)
+    
+    return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    // Inject Farcaster mini app embed meta tag for sharing (if not already in layout)
+    if (!document.querySelector('meta[name="fc:miniapp"]')) {
+      const miniappEmbed = generateMiniAppEmbed()
       const meta = document.createElement('meta')
-      meta.setAttribute('property', 'fc:miniapp')
+      meta.setAttribute('name', 'fc:miniapp')
       meta.setAttribute('content', JSON.stringify(miniappEmbed))
       document.head.appendChild(meta)
     }

@@ -26,6 +26,20 @@ export default function Home() {
   const [isAdventModalOpen, setIsAdventModalOpen] = useState(false)
 
   useEffect(() => {
+    // Call ready() immediately to dismiss splash screen
+    const notifyReady = async () => {
+      if (typeof window !== 'undefined') {
+        try {
+          const { sdk } = await import('@farcaster/miniapp-sdk')
+          await sdk.actions.ready()
+        } catch (error) {
+          // Not in Farcaster context
+        }
+      }
+    }
+    notifyReady()
+
+    // Load art in background (non-blocking)
     const loadArtPieces = async () => {
       try {
         // List of ASCII art files in the pants directory with metadata
@@ -145,17 +159,6 @@ export default function Home() {
 
         setArtPieces(loadedPieces)
         setLoading(false)
-
-        // Call Farcaster SDK ready after content is loaded
-        if (typeof window !== 'undefined') {
-          try {
-            const { sdk } = await import('@farcaster/miniapp-sdk')
-            await sdk.actions.ready()
-          } catch (error) {
-            // Not in Farcaster context, that's fine
-            console.log('Not running in Farcaster Mini App context')
-          }
-        }
       } catch (err) {
         setError("Failed to load Moonynads gallery")
         setLoading(false)

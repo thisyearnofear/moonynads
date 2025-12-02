@@ -68,6 +68,7 @@ export function generateManifest(accountAssociation: object) {
       ...MINIAPP_METADATA,
       ...MINIAPP_OPENGRAPH,
       requiredCapabilities: ['actions.ready', 'actions.composeCast', 'wallet.getEthereumProvider'],
+      requiredChains: ['eip155:143'],
     },
   }
 }

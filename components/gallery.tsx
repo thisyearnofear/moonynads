@@ -8,6 +8,8 @@ interface ArtPiece {
   content: string
   description: string
   rarity: "common" | "uncommon" | "rare" | "epic" | "legendary"
+  tokenId?: number
+  owned?: boolean
 }
 
 interface GalleryProps {
@@ -39,6 +41,7 @@ export default function Gallery({ artPieces }: GalleryProps) {
 
   return (
     <div className="max-w-6xl mx-auto">
+
       {/* Gallery grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {artPieces.length > 0 ? (

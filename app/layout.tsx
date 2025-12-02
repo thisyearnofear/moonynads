@@ -10,8 +10,8 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Moonynads - ASCII Art Gallery",
-  description: "A gallery of ASCII art pieces with a retro terminal aesthetic",
+  title: "Moonynads - Onchain ASCII Art NFTs on Monad",
+  description: "Collect unique lunar ASCII art NFTs on Monad blockchain. 12 Days of Moonynads Advent Calendar featuring rare digital collectibles.",
   generator: "Next.js",
   icons: {
     icon: [

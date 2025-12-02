@@ -1,0 +1,14 @@
+{
+  "name": "moonynads-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Moonynads NFT Collection on Monad",
+  "scripts": {
+    "compile": "forge build",
+    "test": "forge test",
+    "deploy": "forge script script/Deploy.s.sol --rpc-url $RPC_URL --broadcast --verify",
+    "deploy:local": "forge script script/Deploy.s.sol --rpc-url http://127.0.0.1:8545 --broadcast"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^5.0.0"
+  }
+}

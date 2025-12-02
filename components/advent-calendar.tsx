@@ -96,7 +96,7 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
       case 'uncommon': return 'text-accent'
       case 'rare': return 'text-primary'
       case 'epic': return 'text-destructive'
-      case 'legendary': return 'text-[#FFD700]' // Gold
+      case 'legendary': return 'text-[#FFD700]'
       default: return 'text-foreground'
     }
   }
@@ -218,6 +218,13 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
               <div className="text-xs text-foreground/70 space-y-1 font-mono">
                 <p>Moonynad #{selectedArt.id.toUpperCase()}</p>
                 <p>Limited Edition Christmas Drop • {currentDate.getFullYear()}</p>
+              </div>
+              
+              {/* Minting Coming Soon */}
+              <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded text-center">
+                <p className="font-mono text-xs text-yellow-600 dark:text-yellow-400">
+                  🚀 NFT Minting Coming Soon!
+                </p>
               </div>
             </div>
           </div>

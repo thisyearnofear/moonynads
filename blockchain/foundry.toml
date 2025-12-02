@@ -1,0 +1,23 @@
+[profile.default]
+src = "."
+out = "out"
+libs = ["lib"]
+remappings = [
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/"
+]
+
+[rpc_endpoints]
+monad = "https://rpc.monad.xyz"
+monad_alt = "https://rpc1.monad.xyz"
+
+[etherscan]
+monad = { key = "${MONAD_ETHERSCAN_API_KEY}", url = "https://monadvision.com/api" }
+
+# Gas configuration for Monad
+[profile.default.gas_price]
+monad = 1000000000  # 1 gwei
+
+# Optimizer settings
+[profile.default.optimizer]
+enabled = true
+runs = 200

@@ -4,6 +4,10 @@ import { useState, useEffect } from "react"
 import Gallery from "@/components/gallery"
 import AdventCalendar from "@/components/advent-calendar"
 import Hero from "@/components/hero"
+import { Footer } from "@/components/footer"
+import { MemetokenBanner } from "@/components/memetoken-banner"
+import { Moonverse } from "@/components/moonverse"
+import { MoonverseNav } from "@/components/moonverse-nav"
 
 interface ArtPiece {
   id: string
@@ -193,10 +197,21 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-background">
+      <MemetokenBanner />
+      
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="mb-12">
-          <Hero data={{ title: "MOONYNADS GALLERY", subtitle: "ASCII ART COLLECTION" }} />
+          <Hero data={{ title: "MOONYNADS GALLERY", subtitle: "ONCHAIN ASCII ART NFTS" }} />
+          
+          {/* Navigation */}
+          <div className="flex justify-center items-center gap-4 mt-6">
+            <div className="font-mono text-xs px-3 py-1 bg-yellow-600 text-white rounded">
+              Web3 Coming Soon
+            </div>
+            <span className="text-yellow-600/30">•</span>
+            <MoonverseNav />
+          </div>
         </section>
 
         {isChristmasSeason && (
@@ -227,9 +242,17 @@ export default function Home() {
           <h2 className="text-xl md:text-2xl font-bold text-center mb-8 text-yellow-700 dark:text-yellow-500 font-mono">
             COMPLETE COLLECTION
           </h2>
+          
           <Gallery artPieces={artPieces} />
         </section>
       </div>
+
+      {/* Moonverse Section */}
+      <div className="border-t border-yellow-600/20 bg-background/50">
+        <Moonverse />
+      </div>
+      
+      <Footer />
     </main>
   )
 }

@@ -1,32 +1,27 @@
 {
-  "name": "butts",
-  "version": "1.1.0",
-  "description": "(_|_)",
-  "main": "index.js",
+  "name": "moonynads",
+  "version": "1.0.0",
+  "description": "ASCII Art Gallery with Next.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "bin": {
-    "butts": "./cli.js"
-  },
-  "bugs": {
-    "url": "https://github.com/meandavejustice/butts/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/meandavejustice/butts.git"
-  },
-  "keywords": [
-    "butts",
-    "behind",
-    "cli",
-    "api",
-    "booty",
-    "bum"
-  ],
-  "author": "meandave",
-  "license": "MIT",
   "dependencies": {
-    "ls-stream": "^1.0.0"
+    "next": "^14.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@vercel/analytics": "^1.3.1",
+    "tailwindcss": "^3.4.3",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.2.79",
+    "@types/react-dom": "^18.2.25"
   }
 }

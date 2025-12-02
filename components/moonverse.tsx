@@ -186,37 +186,6 @@ export function Moonverse() {
             </a>
           </div>
         </div>
-
-        {/* Ecosystem Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <div className="font-mono text-2xl font-bold text-yellow-700 dark:text-yellow-500">
-              {MOONVERSE_APPS.length}
-            </div>
-            <div className="text-xs text-foreground/60">Live Apps</div>
-          </div>
-          
-          <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <div className="font-mono text-2xl font-bold text-yellow-700 dark:text-yellow-500">
-              {new Set(MOONVERSE_APPS.map(app => app.creator)).size}
-            </div>
-            <div className="text-xs text-foreground/60">Builders</div>
-          </div>
-          
-          <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <div className="font-mono text-2xl font-bold text-yellow-700 dark:text-yellow-500">
-              {new Set(MOONVERSE_APPS.map(app => app.category)).size}
-            </div>
-            <div className="text-xs text-foreground/60">Categories</div>
-          </div>
-          
-          <div className="text-center p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <div className="font-mono text-2xl font-bold text-yellow-700 dark:text-yellow-500">
-              100%
-            </div>
-            <div className="text-xs text-foreground/60">Community</div>
-          </div>
-        </div>
       </div>
     </section>
   )

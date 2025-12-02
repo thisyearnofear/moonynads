@@ -63,6 +63,20 @@ export const metadata: Metadata = {
     'fc:frame:button:1:action': 'link',
     'fc:frame:button:1:target': 'https://m00nynads.vercel.app',
     'og:image': '/moonynadsbanner.png',
+    'fc:miniapp': JSON.stringify({
+      version: '1',
+      imageUrl: 'https://m00nynads.vercel.app/moonynadsbanner.png',
+      button: {
+        title: '🌙 Explore Gallery',
+        action: {
+          type: 'launch_frame',
+          name: 'Moonynads',
+          url: 'https://m00nynads.vercel.app',
+          splashImageUrl: 'https://m00nynads.vercel.app/moonynadssquare.png',
+          splashBackgroundColor: '#0a0a0b'
+        }
+      }
+    })
   },
   
   icons: {

@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
@@ -14,25 +15,27 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  */
 contract Moonynads is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable, Ownable, ReentrancyGuard {
     uint256 public constant MAX_SUPPLY = 10000;
-    uint256 public constant ADVENT_MINT_PRICE = 0.001 ether; // 0.001 MON
     uint256 public constant ADVENT_DAILY_LIMIT = 100;
     
     uint256 public currentTokenId = 0;
     
     // Advent Calendar Configuration
-    uint256 public constant ADVENT_START_DAY = 13; // December 13th
-    uint256 public constant ADVENT_END_DAY = 24;   // December 24th
+    uint256 public constant ADVENT_START_DAY = 13;
+    uint256 public constant ADVENT_END_DAY = 24;
     
-    // Mapping from advent day to token ID
+    // Payment Configuration
+    IERC20 public m00nadToken;
+    uint256 public constant MINT_PRICE_M00NAD = 100_000_000; // 100M m00nad tokens
+    uint256 public constant DISCOUNT_PRICE_M00NAD = 50_000_000; // 50M m00nad (allowlist discount)
+    
+    // Allowlist Configuration
+    mapping(address => uint256) public allowlistTier; // 0=none, 1=discount, 2=free
+    mapping(uint256 => mapping(address => bool)) public allowlistMinted; // allowlist mint tracking per day
+    
+    // Mappings for advent mechanics
     mapping(uint256 => uint256) public adventDayToTokenId;
-    
-    // Mapping to track if user minted advent token for specific day
     mapping(uint256 => mapping(address => bool)) public adventTokenMinted;
-    
-    // Mapping from day to number of tokens minted
     mapping(uint256 => uint256) public adventDayMintCount;
-    
-    // Token rarity mapping
     mapping(uint256 => string) public tokenRarity;
     
     // Base URI for metadata
@@ -42,15 +45,18 @@ contract Moonynads is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable
     event AdventTokenMinted(address indexed user, uint256 indexed day, uint256 indexed tokenId);
     event RaritySet(uint256 indexed tokenId, string rarity);
     event BaseURIUpdated(string newBaseURI);
+    event AllowlistUpdated(address[] indexed addresses, uint256[] tiers);
+    event AllowlistMint(address indexed user, uint256 indexed day, uint256 tier);
 
     constructor(
         string memory name,
         string memory symbol,
-        string memory baseURI
+        string memory baseURI,
+        address _m00nadToken
     ) ERC721(name, symbol) Ownable(msg.sender) {
+        require(_m00nadToken != address(0), "Invalid token address");
+        m00nadToken = IERC20(_m00nadToken);
         _baseTokenURI = baseURI;
-        
-        // Initialize advent day mappings
         _initializeAdventTokenIds();
     }
     
@@ -80,34 +86,59 @@ contract Moonynads is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable
     }
 
     /**
-     * @dev Mint an advent calendar token for the current day
+     * @dev Mint an advent calendar token with $m00nad payment
      */
-    function mintAdventToken(uint256 day) external payable nonReentrant whenNotPaused {
+    function mintAdventToken(uint256 day) external nonReentrant whenNotPaused {
         require(isAdventDay(day), "Invalid advent day");
-        require(msg.value >= ADVENT_MINT_PRICE, "Insufficient payment");
         require(!adventTokenMinted[day][msg.sender], "Already minted for this day");
         require(adventDayMintCount[day] < ADVENT_DAILY_LIMIT, "Daily limit reached");
         
-        // Get the base token ID for this day
+        // Require m00nad token transfer
+        require(
+            m00nadToken.transferFrom(msg.sender, address(this), MINT_PRICE_M00NAD),
+            "Token transfer failed"
+        );
+        
+        _executeMint(day);
+    }
+
+    /**
+     * @dev Mint with allowlist benefits (discount or free)
+     */
+    function mintAdventTokenAllowlist(uint256 day) external nonReentrant whenNotPaused {
+        uint256 tier = allowlistTier[msg.sender];
+        require(tier > 0, "Not on allowlist");
+        require(isAdventDay(day), "Invalid advent day");
+        require(!allowlistMinted[day][msg.sender], "Already minted for this day");
+        require(adventDayMintCount[day] < ADVENT_DAILY_LIMIT, "Daily limit reached");
+        
+        // Tier 1: Discount (50M m00nad)
+        if (tier == 1) {
+            require(
+                m00nadToken.transferFrom(msg.sender, address(this), DISCOUNT_PRICE_M00NAD),
+                "Token transfer failed"
+            );
+        }
+        // Tier 2: Free (no transfer needed)
+        
+        allowlistMinted[day][msg.sender] = true;
+        emit AllowlistMint(msg.sender, day, tier);
+        
+        _executeMint(day);
+    }
+
+    /**
+     * @dev Internal function to execute mint logic (DRY)
+     */
+    function _executeMint(uint256 day) internal {
         uint256 baseTokenId = adventDayToTokenId[day];
         require(baseTokenId > 0, "Token ID not set for this day");
         
-        // Create unique token ID: baseTokenId * 1000 + mint count for this day
         uint256 tokenId = baseTokenId * 1000 + adventDayMintCount[day];
-        
-        // Mint the token
         _safeMint(msg.sender, tokenId);
-        
-        // Set token URI
         _setTokenURI(tokenId, string(abi.encodePacked(_baseTokenURI, "/", _toString(tokenId), ".json")));
-        
-        // Mark as minted for this user and day
         adventTokenMinted[day][msg.sender] = true;
-        
-        // Increment daily mint count
         adventDayMintCount[day]++;
-        
-        // Set rarity based on mint order
         _setTokenRarity(tokenId, _calculateRarity(adventDayMintCount[day]));
         
         emit AdventTokenMinted(msg.sender, day, tokenId);
@@ -138,6 +169,39 @@ contract Moonynads is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable
     function getTokenRarity(uint256 tokenId) external view returns (string memory) {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         return tokenRarity[tokenId];
+    }
+
+    /**
+     * @dev Set allowlist tiers for addresses (owner only)
+     */
+    function setAllowlist(address[] calldata addresses, uint256[] calldata tiers) 
+        external 
+        onlyOwner 
+    {
+        require(addresses.length == tiers.length, "Array length mismatch");
+        require(addresses.length > 0, "Empty arrays");
+        
+        for (uint256 i = 0; i < addresses.length; i++) {
+            require(addresses[i] != address(0), "Invalid address");
+            require(tiers[i] <= 2, "Invalid tier (must be 0, 1, or 2)");
+            allowlistTier[addresses[i]] = tiers[i];
+        }
+        
+        emit AllowlistUpdated(addresses, tiers);
+    }
+
+    /**
+     * @dev Get allowlist tier for an address
+     */
+    function getAllowlistTier(address user) external view returns (uint256) {
+        return allowlistTier[user];
+    }
+
+    /**
+     * @dev Check if user is on allowlist
+     */
+    function isAllowlisted(address user) external view returns (bool) {
+        return allowlistTier[user] > 0;
     }
 
     /**

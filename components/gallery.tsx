@@ -62,9 +62,21 @@ export default function Gallery({ artPieces }: GalleryProps) {
                   <div className="ascii-art font-mono text-xs text-foreground/70 whitespace-pre overflow-auto max-h-40 mb-3 leading-tight">
                     {piece.content}
                   </div>
-                  <p className="text-xs text-foreground/60 line-clamp-2">
+                  <p className="text-xs text-foreground/60 line-clamp-2 mb-3">
                     {piece.description}
                   </p>
+                  <div className="flex gap-2">
+                    <span className="flex-1 text-xs text-yellow-600 dark:text-yellow-500 font-mono">
+                      Click to view full
+                    </span>
+                    <a
+                      href={`/pants/${piece.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-xs bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded font-mono transition-colors"
+                    >
+                      🎬 Animate
+                    </a>
+                  </div>
                 </button>
               ))
             ) : (

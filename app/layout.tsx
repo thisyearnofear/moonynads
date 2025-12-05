@@ -4,6 +4,7 @@ import { JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Web3Provider } from "@/components/web3-provider"
 import { FarcasterProvider } from "@/components/farcaster-provider"
+import { DemoModeHandler } from "@/components/demo-mode-handler"
 import { MINIAPP_CONFIG, MINIAPP_METADATA, MINIAPP_OPENGRAPH, generateMiniAppEmbed } from "@/lib/miniapp-config"
 import "./globals.css"
 
@@ -78,6 +79,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${jetbrainsMono.className} antialiased`}>
+        <DemoModeHandler />
         <FarcasterProvider>
           <Web3Provider>
             {children}

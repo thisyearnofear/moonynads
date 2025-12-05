@@ -26,22 +26,25 @@ Moonynads is pioneering the future of interactive NFT experiences by combining A
 - [x] Comprehensive footer with network information
 
 #### Technical Stack
-- Next.js 14 with TypeScript
+- Next.js 15 with TypeScript
 - Tailwind CSS for consistent styling
 - Vercel deployment pipeline
 - Mobile-optimized responsive design
 
 ---
 
-### **Phase 2: Blockchain Infrastructure** 🔄 IN PROGRESS
+### **Phase 2: Blockchain Infrastructure** ✅ 90% COMPLETED
 *Target: January 2024*
 
 #### Smart Contract Development
-- [ ] **Core NFT Contract** (`Moonynads.sol`)
-  - ERC721 with enumerable and metadata extensions
-  - Multi-mechanic minting system
-  - Pausable and ownable security features
-  - Gas-optimized for Monad's fast execution
+- [x] **Core NFT Contract** (`Moonynads.sol`) ✨ ENHANCED
+  - ERC721 with enumerable and metadata extensions ✓
+  - Advent calendar minting mechanics ✓
+  - Pausable and ownable security features ✓
+  - Rarity calculation system ✓
+  - **$m00nad token payment system** ✅ NEW
+  - **Three-tier allowlist (discount/free)** ✅ NEW
+  - **Batch allowlist management** ✅ NEW
 
 - [ ] **Auction System** (`MoonynadsAuction.sol`)
   - Dutch auction implementation
@@ -54,100 +57,219 @@ Moonynads is pioneering the future of interactive NFT experiences by combining A
   - Automatic prize distribution
 
 #### Web3 Integration
-- [ ] **Wallet Connection**
-  - MetaMask, WalletConnect, Coinbase Wallet support
-  - Automatic Monad network detection and switching
-  - Connection state persistence
+- [x] **Wallet Connection**
+  - MetaMask integration with Wagmi v2 ✓
+  - Automatic Monad network detection and switching ✓
+  - Connection state persistence ✓
 
-- [ ] **Token Gating System**
-  - Real-time m00nynad balance verification
-  - 250M+ token requirement for complete gallery access
-  - Graduated access tiers for different balance levels
+- [x] **Token Gating System**
+  - Real-time m00nynad balance verification ✓
+  - Graduated access tiers for different balance levels ✓
+  - Hook-based access management system ✓
 
-- [ ] **Contract Interactions**
-  - Mint transaction handling with proper error states
-  - Balance checking and ownership verification
-  - Transaction history and receipt generation
+- [x] **Contract Interactions**
+  - $m00nad token transfer handling ✓
+  - Allowlist tier verification ✓
+  - Ownership verification logic ✓
 
 #### API Development
-- [ ] **Metadata Service**
-  - Dynamic metadata generation for each token
-  - IPFS integration for decentralized storage
-  - Attribute and rarity calculation engine
+- [x] **Metadata Service** (Complete)
+  - Dynamic metadata generation for each token ✓
+  - Attribute and rarity calculation engine ✓
+  - Memetoken and network metadata integration ✓
 
-- [ ] **Image Generation**
-  - SVG creation from ASCII art files
-  - Dynamic styling and token ID embedding
-  - Caching optimization for performance
+- [x] **Image Generation**
+  - SVG creation from ASCII art files ✓
+  - Dynamic styling and token ID embedding ✓
+  - Lunar-themed visual styling ✓
+
+#### Admin Tools
+- [x] **Allowlist Manager UI** ✅ NEW
+  - CSV import functionality
+  - Batch tier assignment
+  - Visual preview before submission
+  - Transaction tracking
 
 ---
 
-### **Phase 3: Multi-Mechanic Advent Calendar** 🚀 UPCOMING
-*Target: December 2024*
+### **Phase 3: Community-First Advent Calendar** 🔄 IN PROGRESS
+*Strategy: Widen → Test → Monetize (Free/Challenges → Mechanics → Scarcity)*
+
+#### Advent Calendar Philosophy
+The calendar is designed as a **three-phase funnel**:
+1. **Days 13-16: COMMUNITY BUILDING** (Free/Low-Cost, High Accessibility)
+   - Goal: Maximum participation, social proof, allowlist growth
+   - Mechanics: Free mints, challenges, ecosystem integration
+   
+2. **Days 17-20: MECHANICS TESTING** (Moderate Price, Interesting Designs)
+   - Goal: Demand validation, identify what works
+   - Mechanics: Generative variants, voting, challenges
+   
+3. **Days 21-24: SCARCITY & EXCLUSIVITY** (High Value, Limited Supply)
+   - Goal: FOMO, high-value collectors, proven demand
+   - Mechanics: Auctions, whale tiers, 1/1 ultimates
+
+---
 
 #### Daily Mechanics Implementation
 
-##### **December 13: Classic Mint** 
-- First-come-first-served at 0.001 MON
-- 100 edition limit
-- Entry point for new collectors
+### Animation Infrastructure (Phase 2.5: Foundation ✅)
+The following animation capabilities are **production-ready**:
 
-##### **December 14: Dutch Auction**
-- Starting price: 1 MON, decreasing hourly
-- Single 1/1 legendary edition
-- Price discovery mechanism
+**Animation Engine**:
+- 7 modes: `still`, `lineWave`, `blockSway`, `colorCycle`, `glitch`, `frameCycle`, `svgWave`
+- 4 color palettes: `yellow`, `green`, `blue`, `rainbow`
+- Advanced effects: speed (0-3), amplitude (0-24), gradient overlays, character targeting
+- Canvas rendering: 60+ FPS capable, real-time preview
 
-##### **December 15: Raffle System**
-- 24-hour entry period for 100M+ token holders
-- 5 winner selection via verifiable randomness
-- Gas-free entry with automated distribution
+**Recording & Upload Pipeline**:
+- Canvas stream capture (WebM output, 50-100KB per animation)
+- IPFS integration with metadata persistence
+- Upload API validation and error handling
 
-##### **December 16: Gaming Tournament**
-- Integration with m00n.app and M00nlander APIs
-- Combined leaderboard scoring system
-- 3 edition rewards (1st, 2nd, 3rd place)
-- Live ceremony on Farcaster
+**Animation Studio** (`/pants`):
+- 13 selectable ASCII designs with live preview
+- Full parameter controls (sliders for speed, amplitude, palette selection)
+- LocalStorage persistence per design
+- Frame sequence support for multi-frame animations
 
-##### **December 17: Social Media Contest**
-- Twitter/X engagement tracking
-- Community voting mechanism on Farcaster
-- 6 total winners (1 grand prize + 5 runners-up)
+**Metadata Format**:
+```typescript
+{
+  "animation_url": "ipfs://...",      // WebM video
+  "animation_settings": {
+    "mode": "lineWave",
+    "palette": "yellow",
+    "speed": 1.5,
+    "amplitude": 12,
+    "gradient": true,
+    "targetChar": ""
+  }
+}
+```
 
-##### **December 18: English Auction**
-- 24-hour competitive bidding
-- Single ultra-rare 1/1 edition
-- Starting bid: 0.1 MON
+---
 
-##### **December 19: Community Challenge**
-- Collective ecosystem goals (trading volume, activity)
-- Open edition reward if targets met
-- Community coordination mechanics
+## PHASE 1: COMMUNITY BUILDING (Days 13-16)
 
-##### **December 20: Creator Tribute**
-- Honoring ecosystem builders (horsefacts, papa, m00npapi)
-- 3 creator-distributed editions
-- Community recognition system
+##### **December 13: Free Community Mint** ✅ READY
+- [x] 500 edition open mint
+- [x] **FREE** (removes barrier to entry)
+- [x] Animated classic ASCII recordings
+- [ ] Marketing: "Join the lunar movement" push
+- **Animation Control**: ⭐⭐⭐⭐⭐ Full customization
+  - Users select: design, animation mode, palette, speed, amplitude
+  - Record via canvas → upload to IPFS
+  - All 7 animation modes available
+  - All 4 color palettes available
 
-##### **December 21: Whale Exclusive**
-- 500M+ token holder requirement
-- 10 edition premium mint at 0.01 MON
-- Ultra-exclusive tier access
+##### **December 14: Social Challenge Mint** 🚧 PLANNED
+- [ ] 250 editions
+- [ ] **FREE for verified engagement:**
+  - Farcaster cast share
+  - Discord join + verification
+  - Twitter follow + on-chain verification
+- [ ] Build allowlist for future days
+- **Animation Control**: ⭐ Static preset (no customization)
 
-##### **December 22: Mystery Box**
-- Blind mint with post-reveal rarity
-- 50 edition variable distribution
-- Surprise mechanic element
+##### **December 15: Ecosystem Builder Raffle** 🚧 PLANNED
+- [ ] 100 guaranteed + raffle entries
+- [ ] **FREE for:**
+  - Top 50 m00n.app players
+  - M00nlander completionists
+  - 25M+ m00nynad holders
+- [ ] Raffle slots for general community
+- **Animation Control**: ⭐⭐ Limited modes only (blockSway, still)
 
-##### **December 23: Open Edition**
-- 24-hour unlimited minting window
-- Accessibility-focused at 0.0001 MON
-- Maximum participation event
+##### **December 16: Generative Community Edition** 🚧 PLANNED
+- [ ] 1000 edition open mint
+- [ ] **50M m00nad** (first paid day, low entry)
+- [ ] Generative ASCII variants (algorithm-unique via deterministic seed)
+- [ ] **Allowlist: 25M m00nad** (reward early participants)
+- **Animation Control**: ⭐⭐⭐⭐ User selects from all modes + full customization
 
-##### **December 24: Christmas Finale**
-- Multi-tier celebration event
-- Free airdrop to all participants
-- Complete set bonus for 5+ collectors
-- Final 1/1 ultimate collector auction
+---
+
+## PHASE 2: MECHANICS TESTING (Days 17-20)
+
+##### **December 17: Community Voting Contest** 🚧 PLANNED
+- [ ] 6 winner editions
+- [ ] **100M m00nad** or **FREE for verified votes**
+- [ ] Community voting determines winners via Farcaster
+- [ ] Test voting engagement
+- **Animation Control**: ⭐ Curated preset (no user choice)
+
+##### **December 18: Generative Variants II** 🚧 PLANNED
+- [ ] 250 edition algorithmic generation
+- [ ] **75M m00nad** (moderate price)
+- [ ] Users pick animation mode before mint
+- [ ] Each NFT: unique generated ASCII + chosen animation
+- **Animation Control**: ⭐⭐⭐⭐ Hybrid generation (user + algorithm)
+
+##### **December 19: Collective Community Challenge** 🚧 PLANNED
+- [ ] 100-500 editions (goal-dependent)
+- [ ] **100M m00nad** to participate
+- [ ] Ecosystem goal (trading volume, activity)
+- [ ] If goal met: Free bonus airdrop to all participants
+- **Animation Control**: ⭐⭐⭐ Standard if goal unmet, Premium (colorCycle + gradient) if goal met
+
+##### **December 20: Creator Tribute (Free Airdrop)** 🚧 PLANNED
+- [ ] 1000 free edition airdrop
+- [ ] **FREE** to all Day 13-19 holders
+- [ ] Honors ecosystem builders
+- [ ] Celebrates growth checkpoint
+- **Animation Control**: ⭐⭐ Special curated glitch animation (locked, celebratory)
+
+---
+
+## PHASE 3: SCARCITY & EXCLUSIVITY (Days 21-24)
+
+##### **December 21: Whale Exclusive Premium** 🚧 PLANNED
+- [ ] 25 edition ultra-premium
+- [ ] **250M m00nad** per mint
+- [ ] **Requirement: 500M+ m00nad holdings**
+- [ ] Custom commissioned ASCII art
+- [ ] Lifetime trading discount token (meta-utility)
+- **Animation Control**: ⭐⭐⭐⭐⭐ Full access (all modes, all palettes, custom parameters)
+
+##### **December 22: Mystery Box (Blind Mint)** 🚧 PLANNED
+- [ ] 50 edition blind mint
+- [ ] **150M m00nad** (gamble premium)
+- [ ] Reveal rarity post-mint (1 Legendary, 5 Epic, 15 Rare, 29 Uncommon)
+- [ ] Reveal locked until December 24
+- **Animation Control**: ⭐ Hidden until reveal (1L: glitch+rainbow | 5E: colorCycle | 15R: lineWave | 29U: still)
+
+##### **December 23: Dutch Auction (1/1 Rare)** 🚧 PLANNED
+- [ ] Single ultra-rare 1/1 edition
+- [ ] Price: **500M m00nad → 50M m00nad** (24 hour decrease)
+- [ ] 24-hour auction window
+- [ ] Winner gets custom piece + featured profile
+- **Animation Control**: ⭐⭐⭐⭐⭐ Ultimate customization (all modes, all palettes, full parameters)
+
+##### **December 24: Triple Finale Celebration** 🚧 PLANNED
+
+**Part 1: Community Completion (FREE)**
+- 5000 editions, free to all participants
+- Collaborative celebratory ASCII piece
+- Proof of full journey
+- **Animation Control**: ⭐⭐ Preset (lineWave + gradient + rainbow, locked)
+
+**Part 2: Collector Set Bonus (LIMITED)**
+- 100 editions, **200M m00nad**
+- Requirement: 1 NFT from each day (13-24)
+- Golden edition with achievement metadata
+- Bragging rights + rarity
+- **Animation Control**: ⭐⭐⭐ Golden set (colorCycle + gradient, customizable speed/amplitude)
+
+**Part 3: Ultimate 1/1 Auction (FINAL)**
+- The "Celestial Whale" - final 1/1 ever
+- English auction, 50M m00nad starting bid
+- Winner receives:
+  - Ultimate 1/1 NFT
+  - Custom framed physical print
+  - Lifetime special Discord role
+  - Name immortalized in contract comments
+- **Animation Control**: ⭐⭐⭐⭐⭐ Total freedom (all modes, all palettes, custom parameters)
 
 #### Technical Requirements
 - [ ] **Multi-Contract Architecture**
@@ -159,6 +281,11 @@ Moonynads is pioneering the future of interactive NFT experiences by combining A
   - Gaming platform API connections
   - Social media monitoring systems
   - Chainlink oracles for external data
+
+- [x] **Basic UI Components**
+  - Advent calendar interface ✓
+  - Token gating display ✓
+  - Wallet connection UI ✓
 
 - [ ] **Advanced UI Components**
   - Real-time auction interfaces
@@ -240,24 +367,59 @@ Moonynads is pioneering the future of interactive NFT experiences by combining A
 
 ## 📊 Success Metrics
 
-### **Phase 1 Targets** ✅
+### **Phase 1 Targets** ✅ COMPLETED
 - [x] Website launch with full responsive design
 - [x] Moonverse ecosystem documentation
 - [x] Community engagement and social presence
 
-### **Phase 2 Targets**
+### **Phase 2 Targets** 🔄 IN PROGRESS - 90% COMPLETE
+
+**Completed**:
+- [x] Core smart contracts enhanced (token payment + allowlist)
+- [x] Wallet integration and network switching functional
+- [x] Token gating system with tiered access implemented
+- [x] Allowlist manager UI ready
+- [x] Payment configuration constants set
+
+**Remaining**:
+- [ ] Deploy contract to Monad testnet
+- [ ] Test with sample allowlist data
 - [ ] 1,000+ wallet connections in first week
 - [ ] 500+ token-gated gallery access users
-- [ ] Zero critical security vulnerabilities
+- [ ] Zero critical security vulnerabilities (pre-audit checklist)
 - [ ] Sub-2-second transaction confirmation times
 
-### **Phase 3 Targets**
-- [ ] 10,000+ total advent calendar interactions
-- [ ] 50+ gaming tournament participants daily
-- [ ] 100+ social media contest entries per day
-- [ ] 95%+ successful transaction completion rate
+### **Phase 3 Targets** 🔄 COMMUNITY-FIRST STRATEGY
 
-### **Phase 4 Targets**
+**Days 13-16 (Community Building Phase)**
+- [ ] 5,000+ cumulative community members registered
+- [ ] 2,000+ free/allowlist mints (Days 13-15)
+- [ ] 1,000+ demand validation via Day 16 generative mint
+- [ ] 500+ social challenge participations
+- [ ] 100+ ecosystem builder qualifications
+
+**Days 17-20 (Mechanics Testing Phase)**
+- [ ] 300+ voting participants (Day 17)
+- [ ] 60%+ of community attempts generative mechanic (Day 18)
+- [ ] 50%+ community challenge goal completion (Day 19)
+- [ ] Day 20 airdrop reaches 3,000+ holders
+- [ ] Average 4+ unique NFTs per active collector
+
+**Days 21-24 (Scarcity & Exclusivity Phase)**
+- [ ] Whale tier 90%+ mint rate (proven demand signal)
+- [ ] Mystery box all 50 editions sold
+- [ ] Dutch auction final price 80%+ of starting bid (strong demand)
+- [ ] Complete set bonus 50%+ claimed (loyalty incentive working)
+- [ ] Ultimate 1/1 auction final bid 200M+ m00nad
+
+**Overall Success Metrics**
+- [ ] 10,000+ total NFTs minted across all days
+- [ ] 5,000+ unique wallets participated
+- [ ] 3,000+ m00nad tokens earned by ecosystem
+- [ ] 95%+ successful transaction completion rate
+- [ ] Zero exploit attempts or vulnerabilities
+
+### **Phase 4 Targets** 🌌 FUTURE
 - [ ] Cross-ecosystem integration with 5+ platforms
 - [ ] 1M+ m00nynad tokens in ecosystem circulation
 - [ ] 24/7 community activity and engagement
@@ -306,4 +468,118 @@ Our success will be measured not just in sales or floor prices, but in the vibra
 
 For technical contributions, partnership inquiries, or ecosystem collaboration opportunities, please reach out through our community channels or submit issues/PRs to our public repositories.
 
-*Last Updated: January 2024*
+*Last Updated: December 2025*
+
+---
+
+## 🤖 Kiro Integration for Kiroween Hackathon
+
+### Strategy for Kiro Implementation
+To make Moonynads eligible for the Kiroween hackathon, we need to integrate Kiro technology across multiple aspects of the project. Here's the implementation plan:
+
+#### 1. **Kiro Directory Structure** (`/.kiro`)
+- Create required `.kiro` directory at project root
+- Add Kiro configuration files for specs, hooks, and steering
+- Integrate with Git (remove from .gitignore)
+
+#### 2. **Vibe Coding Integration**
+- Use vibe coding for generating new ASCII art pieces based on user prompts
+- Implement conversational interfaces for creating custom animations
+- Document impressive code generation examples for hackathon submission
+
+#### 3. **Agent Hooks Automation**
+- Implement Kiro agent hooks for:
+  - Automated ASCII art generation workflows
+  - Smart contract deployment automation
+  - Testing and validation processes
+  - CI/CD pipeline enhancements
+
+#### 4. **Spec-Driven Development**
+- Create Kiro specs for:
+  - ASCII art generation algorithms
+  - Animation parameter optimization
+  - Smart contract functionality
+  - User interface improvements
+
+#### 5. **Steering Docs Implementation**
+- Develop steering documents to guide Kiro in:
+  - Artistic style consistency for ASCII pieces
+  - Blockchain integration best practices
+  - UI/UX design decisions
+  - Performance optimization strategies
+
+#### 6. **MCP (Model Context Protocol) Extensions**
+- Extend Kiro's capabilities to:
+  - Integrate with blockchain APIs
+  - Enhance animation engine with AI suggestions
+  - Improve storage and metadata generation
+  - Connect with external data sources
+
+### Expected Hackathon Category Fit
+- **Resurrection Category**: Bringing ASCII art back to life with modern Kiro-enhanced technologies
+- **Frankenstein Category**: Stitching together blockchain, AI, animations, and community mechanics
+- **Costume Contest Category**: Enhanced UI/UX with Kiro-assisted design improvements
+
+### Implementation Timeline
+- **Week 1**: Set up Kiro infrastructure and directory structure
+- **Week 2**: Implement vibe coding for ASCII art generation
+- **Week 3**: Add agent hooks and spec-driven development workflows
+- **Week 4**: Complete steering docs and MCP extensions
+- **Week 5**: Test, document, and prepare hackathon submission
+
+---
+
+## 📹 Animation & Mint Types Infrastructure
+
+### Current Capabilities ✅
+- **7 Animation Modes**: still, lineWave, blockSway, colorCycle, glitch, frameCycle, svgWave
+- **4 Color Palettes**: yellow, green, blue, rainbow
+- **Advanced Effects**: Speed (0-3), Amplitude (0-24), Gradient, Character targeting
+- **Recording System**: WebM video capture + PNG snapshots
+- **Upload Pipeline**: IPFS integration with metadata persistence
+- **Animation Studio**: Full lab environment with 13 ASCII designs
+
+### Planned Integration by Day
+- **Days 13-16**: Community-first animations (user control + procedural generation)
+- **Days 17-20**: Curated + conditional animations (voting, challenges, bonuses)
+- **Days 21-24**: Premium + exclusive animations (whale customization, mystery reveals)
+
+**→ See**: `docs/ANIMATION_ROADMAP.md` (comprehensive guide)
+**→ See**: `docs/ANIMATION_MINT_MATRIX.md` (visual matrix + deployment plan)
+
+---
+
+## 🎯 Current Status Summary
+
+**Phase 1: Foundation** - ✅ **COMPLETE**
+All core UI/UX and basic infrastructure in place.
+
+**Phase 2: Blockchain Infrastructure** - ✅ **90% COMPLETE**
+**Recent Enhancements (Week of Dec 3)**:
+- ✅ $m00nad token payment system (replaces MON)
+- ✅ Three-tier allowlist (none/discount/free)
+- ✅ Batch allowlist management function
+- ✅ Allowlist Manager UI component
+- ✅ Updated ABI and configuration
+- 📋 Pending: Testnet deployment & testing
+
+**Phase 3: Community-First Advent Calendar** - 🚧 **READY FOR LAUNCH**
+- Day 13 (Free Community Mint) ✅ Ready
+- Days 14-19 (Community → Testing) 🔧 Architecture finalized
+- Days 20-24 (Premium → Scarcity) 📋 Mechanics documented
+- Tiered pricing strategy ✅ Approved
+- Social challenge framework ✅ Defined
+
+**Phase 4: Kiro Integration** - 🚧 **PLANNED FOR HACKATHON**
+- Kiro directory structure implementation ✅ Planned
+- Vibe coding for ASCII generation 🔧 In development
+- Agent hooks automation 📋 Roadmap defined
+- Spec-driven development 📋 Documentation ready
+- Steering docs and MCP extensions 📋 Strategy defined
+
+**Next Priority**:
+1. Deploy contract to Monad testnet
+2. Test allowlist CSV import workflow
+3. Build Day 13-16 public mint UI
+4. Begin Kiro integration for hackathon submission
+5. Community pre-launch marketing

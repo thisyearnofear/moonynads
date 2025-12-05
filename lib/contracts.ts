@@ -19,22 +19,35 @@ export const MOONYNADS_CONTRACT = {
     'function unpause() external',
     'function paused() view returns (bool)',
     
+    // Payment Configuration
+    'function m00nadToken() view returns (address)',
+    'function MINT_PRICE_M00NAD() view returns (uint256)',
+    'function DISCOUNT_PRICE_M00NAD() view returns (uint256)',
+    
     // Advent Calendar Functions
     'function isAdventDay(uint256 day) view returns (bool)',
-    'function mintAdventToken(uint256 day) external payable',
+    'function mintAdventToken(uint256 day) external',
+    'function mintAdventTokenAllowlist(uint256 day) external',
     'function getAdventTokenId(uint256 day) view returns (uint256)',
     'function isAdventTokenMinted(uint256 day, address user) view returns (bool)',
     
+    // Allowlist Functions
+    'function setAllowlist(address[] calldata addresses, uint256[] calldata tiers) external',
+    'function getAllowlistTier(address user) view returns (uint256)',
+    'function isAllowlisted(address user) view returns (bool)',
+    'function allowlistTier(address user) view returns (uint256)',
+    'function allowlistMinted(uint256 day, address user) view returns (bool)',
+    
     // Rarity and Metadata
     'function getTokenRarity(uint256 tokenId) view returns (string)',
-    'function getRarityCount(string rarity) view returns (uint256)',
-    'function getMaxSupply() view returns (uint256)',
     
     // Events
     'event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)',
     'event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)',
     'event AdventTokenMinted(address indexed user, uint256 indexed day, uint256 indexed tokenId)',
-    'event RarityRevealed(uint256 indexed tokenId, string rarity)'
+    'event RaritySet(uint256 indexed tokenId, string rarity)',
+    'event AllowlistUpdated(address[] indexed addresses, uint256[] tiers)',
+    'event AllowlistMint(address indexed user, uint256 indexed day, uint256 tier)'
   ]
 } as const
 
@@ -51,8 +64,16 @@ export const CONFIG = {
   advent: {
     startDay: 13,
     endDay: 24,
-    mintPrice: '0.001',
+    mintPriceM00nad: 100_000_000, // 100M tokens
+    discountPriceM00nad: 50_000_000, // 50M tokens (allowlist)
     dailyLimit: 100
+  },
+  allowlist: {
+    tiers: {
+      0: { name: 'None', discount: 0 },
+      1: { name: 'Discount', discount: 50_000_000 },
+      2: { name: 'Free', discount: 0 }
+    }
   },
   rarity: {
     legendary: { threshold: 5, color: '#FFD700' },

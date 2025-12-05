@@ -1,10 +1,12 @@
 'use client'
 
 import { useAccount } from 'wagmi'
+import { useEffect, useState } from 'react'
 import { useAdventAccess } from '@/hooks/use-advent-access'
 import { M00NYNAD_TOKEN, CONFIG } from '@/lib/blockchain'
 import { WalletConnect } from './wallet-connect'
 import { getTierByDaysUnlocked } from '@/lib/tier-system'
+import { isDemoMode } from '@/lib/demo-mode'
 
 interface TokenGateProps {
   children: React.ReactNode
@@ -25,6 +27,26 @@ export function TokenGate({ children, fallback, day }: TokenGateProps) {
     accessTier,
     totalDaysUnlocked 
   } = useAdventAccess(address)
+  
+  const [demoMode, setDemoMode] = useState(false)
+  
+  useEffect(() => {
+    setDemoMode(isDemoMode())
+  }, [])
+
+  // Demo mode: bypass all checks
+  if (demoMode) {
+    return (
+      <div>
+        <div className="mb-4 bg-yellow-600/10 border border-yellow-600/30 rounded p-3 text-center">
+          <p className="font-mono text-xs text-yellow-600">
+            🎃 DEMO MODE ACTIVE - Full access enabled for judges
+          </p>
+        </div>
+        {children}
+      </div>
+    )
+  }
 
   // If not connected, show connection prompt
   if (!isConnected) {

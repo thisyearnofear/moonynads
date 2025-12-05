@@ -1,11 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CONFIG, M00NYNAD_TOKEN } from '@/lib/blockchain'
+import { isDemoModeActive } from '@/lib/demo-mode'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
   const [showTokenomics, setShowTokenomics] = useState(false)
+  const [judgeMode, setJudgeMode] = useState(false)
+  
+  useEffect(() => {
+    setJudgeMode(isDemoModeActive())
+  }, [])
 
   return (
     <footer className="border-t border-yellow-600/20 bg-background/50 backdrop-blur-sm">
@@ -55,6 +61,17 @@ export function Footer() {
             >
               Chain {CONFIG.network.chainId}
             </button>
+            {judgeMode && (
+              <>
+                <span className="text-yellow-600/30">•</span>
+                <span 
+                  className="text-yellow-600/50 hover:text-yellow-500 transition-colors cursor-help"
+                  title="Judge Mode Active - Full access enabled"
+                >
+                  🎃
+                </span>
+              </>
+            )}
           </div>
         </div>
       </div>

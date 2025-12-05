@@ -1,15 +1,17 @@
 # 🎃 Judge Access Guide - Moonynads
 
-## Quick Access Methods
+## 🔐 Secret Judge Access (Confidential)
 
-### Method 1: Demo URL Parameter (EASIEST)
-Simply add `?demo=true` to any URL:
+### Method 1: Password URL (RECOMMENDED)
+Use one of these secret URLs:
 
 ```
-https://m00nynads.vercel.app?demo=true
+https://m00nynads.vercel.app?judge=kiroween-moonynads-2025
+https://m00nynads.vercel.app?demo=frankenstein-demo
+https://m00nynads.vercel.app?judge=spooky-moon-judge
 ```
 
-This bypasses all wallet and token requirements instantly.
+**Note**: These passwords are confidential. Do not share publicly.
 
 ### Method 2: Keyboard Shortcut
 1. Visit: https://m00nynads.vercel.app
@@ -21,6 +23,12 @@ This bypasses all wallet and token requirements instantly.
 2. Open browser console (F12 or right-click → Inspect)
 3. Run: `sessionStorage.setItem('judge-mode', 'true')`
 4. Refresh the page
+
+### How to Verify Judge Mode is Active
+- Look for a small 🎃 emoji in the footer (bottom right)
+- Hover over it to see "Judge Mode Active"
+- No intrusive banners - maintains user experience
+- All content accessible without wallet
 
 ---
 

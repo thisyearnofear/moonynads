@@ -8,7 +8,10 @@
 **Developer**: @udingethe  
 **Repository**: https://github.com/thisyearnofear/moonynads  
 **Live URL**: https://m00nynads.vercel.app  
+**Judge Access**: See `.kiro/JUDGE_ACCESS.md` for password-protected demo mode  
 **License**: MIT (Open Source)
+
+> **Note for Judges**: Full access without Web3 wallet available via password-protected demo mode. See `.kiro/JUDGE_ACCESS.md` for confidential access credentials.
 
 ---
 

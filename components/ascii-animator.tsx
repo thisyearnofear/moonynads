@@ -345,8 +345,8 @@ export function ASCIIAnimator({
   }
 
   return (
-    <div className="max-w-full">
-      <div className="flex items-center flex-wrap gap-2 mb-4">
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center justify-center flex-wrap gap-2 mb-4">
         <select
           value={animState.mode}
           onChange={(e) => animState.setMode(e.target.value as any)}
@@ -510,7 +510,7 @@ export function ASCIIAnimator({
           </div>
         )}
       </div>
-      <div className="mt-4">
+      <div className="mt-4 flex justify-center">
         <canvas
           ref={canvasRef}
           width={canvasSize.w}

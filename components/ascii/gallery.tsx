@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { ASCIIHoverEffects } from "./ascii-hover-effects"
-import { PreviewBanner } from "./preview-banner"
+import { PreviewBanner } from "../ui/preview-banner"
 
 interface ArtPiece {
   id: string

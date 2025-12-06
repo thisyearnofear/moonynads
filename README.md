@@ -4,7 +4,7 @@ A Next.js web application showcasing a collection of lunar-themed ASCII art piec
 
 ## 📖 About
 
-Moonynads Gallery is an interactive web application that displays a curated collection of 12 unique ASCII art pieces, each featuring different lunar designs with varying rarities:
+Moonynads Gallery is an interactive web application that displays a curated collection of ASCII art pieces, each featuring different lunar designs with varying rarities:
 
 - **Common** - Basic moon designs
 - **Uncommon** - More detailed lunar landscapes
@@ -15,7 +15,7 @@ Moonynads Gallery is an interactive web application that displays a curated coll
 ## 🎨 Features
 
 ### Animation Labs (`/pants`)
-- Browse 12 unique ASCII animation designs with interactive controls
+- Browse multiple ASCII animation designs with interactive controls
 - Real-time animation preview with 7 animation modes (lineWave, blockSway, colorCycle, glitch, etc.)
 - 4-color palette selection (yellow, green, blue, rainbow)
 - Speed and amplitude controls for fine-tuned animations
@@ -30,16 +30,22 @@ Moonynads Gallery is an interactive web application that displays a curated coll
 - Metadata persistence for animation recreation
 
 ### Main Gallery
-- Discover all 12 Moonynads from the listing page (`/pants`)
+- Discover all Moonynads from the listing page (`/pants`)
 - Browse with rarity badges (Common, Uncommon, Rare, Epic, Legendary)
 - Direct access to each design's animation lab
 - Responsive design that works on all devices
 
 ### 🎄 Advent Calendar (Seasonal Feature)
-- Special 12 Days of Moonynads Advent Calendar during Christmas season
+- Special 24 Days of Moonynads Advent Calendar during Christmas season
 - Unlocks one new Moonynad each day from December 13th to 24th
 - Festive countdown showing days until Christmas
 - Limited edition Christmas-themed displays
+
+### 🎨 Deterministic ASCII Generator
+- Seed-based generation: Same seed = same ASCII art (critical for NFT reproducibility)
+- 4 generation styles: lunar, geometric, organic, abstract
+- Configurable parameters: complexity (1-10), density (0.1-1.0), dimensions
+- Performance: <10ms per generation for typical sizes
 
 ## 🚀 Getting Started
 
@@ -66,6 +72,27 @@ npm run build
 npm run start
 ```
 
+## 🎯 Ecosystem Integration
+
+### Cross-Platform Synergy
+- **m00n.app**: Tournament score integration
+- **M00nlander**: Achievement-based rewards
+- **M00nCabal**: Exclusive member benefits
+- **Farcaster**: Social sharing and Mini App integration
+
+### Token Utility ($m00nad)
+- **Payment Currency**: All mints use m00nad tokens
+- **Tiered Access**: Holdings determine gallery access
+- **Ecosystem Rewards**: Cross-platform achievements
+- **Governance**: Community voting on future drops
+
+### 🔐 Three-Tier Allowlist System
+| Tier | Price | Requirement |
+|------|--------|-------------|
+| **None** | 100M m00nad | General public |
+| **Discount** | 50M m00nad | Tier 1 allowlist |
+| **Free** | 0M m00nad | Tier 2 allowlist |
+
 ## 📁 Project Structure
 ```
 moonynads/
@@ -79,72 +106,40 @@ moonynads/
 │       └── [id]/         # Individual lab
 ├── components/           # React components
 │   ├── ascii-animator.tsx # Main animation component
+│   ├── ascii-generator-preview.tsx # Generator UI
 │   └── ...other components
 ├── hooks/                # Custom React hooks
 │   ├── useAnimationState.ts      # localStorage persistence
 │   ├── useAnimationRecorder.ts   # Canvas recording
-│   └── useAnimationUpload.ts     # Upload + validation
+│   ├── useAnimationUpload.ts     # Upload + validation
+│   └── use-ascii-generator.ts    # Deterministic ASCII generation
 ├── lib/
+│   ├── ascii-generator.ts # Deterministic generator engine
 │   ├── pants.ts          # Pants catalog
-│   ├── storage/          # Storage providers (Grove, Local)
 │   └── ...other utilities
 ├── public/
 │   └── pants/            # ASCII animation frames
+├── docs/                 # Comprehensive documentation
 └── package.json          # Project dependencies
 ```
 
-## 🎨 ASCII Art Collection
-
-The gallery features 12 unique lunar ASCII art pieces:
-
-1. **Moon #1** - The original moonynad
-2. **Moon #2** - Detailed lunar landscape
-3. **Moon #3** - Minimalist geometric design
-4. **Lunar Heart** - Romantic heart-shaped moon
-5. **Moon Lady** - Mystical lunar goddess
-6. **Chudnovsky Moon** - Mathematical pattern
-7. **Lunar Butt** - Playful cheeky moon
-8. **Moon Hips** - Curvaceous landscape
-9. **Lunar L** - Abstract L-shaped moon
-10. **Lunar M** - Dual moon formation
-11. **Multi-Moon** - Constellation of moons
-12. **XL Moon** - Extra large display
-
-## 🌟 Rarity System
-
-Each Moonynad has a rarity level that determines its uniqueness:
-
-- **Common** - Basic designs, more readily available
-- **Uncommon** - Enhanced details and complexity
-- **Rare** - Special variations with unique features
-- **Epic** - Exceptional artworks with intricate details
-- **Legendary** - Masterpiece creations with highest value
-
-## 🎁 Advent Calendar
-
-During December, the application features a special Advent Calendar:
-
-- **12 Days of Moonynads** - From December 13th to 24th
-- **Daily Unlocks** - Each day reveals a new Moonynad
-- **Christmas Countdown** - Shows days remaining until Christmas
-- **Festive Theme** - Special holiday styling and messaging
-
 ## 🔧 Technology Stack
 
-- **Next.js 14** - React framework for server-side rendering
+- **Next.js 15** - React framework for server-side rendering
 - **TypeScript** - Type-safe JavaScript
 - **Tailwind CSS** - Utility-first CSS framework
 - **React** - Component-based UI library
+- **Wagmi/viem** - Web3 integration for Monad blockchain
+- **HTML5 Canvas** - 60fps animation rendering
 
-## 📝 License
+## 📚 Documentation
 
-This project is open source and available under the MIT License.
+For comprehensive project documentation, see the detailed guides in `/docs/`:
 
-## 🙏 Acknowledgments
-
-- Inspired by the original ASCII art community
-- Special thanks to all contributors and ASCII artists
-- Built with ❤️ for lunar art enthusiasts
+- **[Getting Started](docs/GETTING_STARTED.md)** - Quick start guide and project overview
+- **[Technical Architecture](docs/TECHNICAL_ARCHITECTURE.md)** - System design, components, and implementation details
+- **[Blockchain Integration](docs/BLOCKCHAIN_INTEGRATION.md)** - Smart contracts, token payments, and deployment guides
+- **[Advent Calendar Strategy](docs/ADVENT_CALENDAR.md)** - Day-by-day mechanics, pricing strategy, and implementation roadmap
 
 ## 🌐 Live Demo
 

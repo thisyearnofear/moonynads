@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { useEasterEggs } from '@/hooks/use-easter-eggs'
+import { useEasterEggs } from '@/hooks/ui/use-easter-eggs'
 
 interface ASCIIHoverEffectsProps {
   children: React.ReactNode

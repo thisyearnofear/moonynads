@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useEasterEggs } from '@/hooks/use-easter-eggs'
+import { useEasterEggs } from '@/hooks/ui/use-easter-eggs'
 
 export default function SecretMoonPage() {
   const [timeSpent, setTimeSpent] = useState(0)

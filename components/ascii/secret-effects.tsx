@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useEasterEggs } from '@/hooks/use-easter-eggs'
+import { useEasterEggs } from '@/hooks/ui/use-easter-eggs'
 
 export function SecretEffects() {
   const { secretsUnlocked, isSecretUnlocked } = useEasterEggs()

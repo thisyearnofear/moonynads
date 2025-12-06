@@ -1,6 +1,6 @@
 'use client'
 
-import { WalletConnect } from './wallet-connect'
+import { WalletConnect } from '../blockchain/wallet-connect'
 
 interface HeroProps {
   data: {

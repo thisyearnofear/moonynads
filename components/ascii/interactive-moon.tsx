@@ -1,6 +1,6 @@
 'use client'
 
-import { useEasterEggs } from '@/hooks/use-easter-eggs'
+import { useEasterEggs } from '@/hooks/ui/use-easter-eggs'
 import { useState } from 'react'
 
 interface InteractiveMoonProps {

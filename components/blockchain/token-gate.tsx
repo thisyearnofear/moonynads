@@ -2,7 +2,7 @@
 
 import { useAccount } from 'wagmi'
 import { useEffect, useState } from 'react'
-import { useAdventAccess } from '@/hooks/use-advent-access'
+import { useAdventAccess } from '@/hooks/calendar/use-advent-access'
 import { M00NYNAD_TOKEN, CONFIG } from '@/lib/blockchain'
 import { WalletConnect } from './wallet-connect'
 import { getTierByDaysUnlocked } from '@/lib/tier-system'

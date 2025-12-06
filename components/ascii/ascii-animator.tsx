@@ -1,19 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useAnimationState } from "@/hooks/useAnimationState";
-import { useAnimationRecorder } from "@/hooks/useAnimationRecorder";
-import { useAnimationUpload } from "@/hooks/useAnimationUpload";
+import { useAnimationState } from "@/hooks/ui/use-animation-state";
+import { useAnimationRecorder } from "@/hooks/ui/use-animation-recorder";
+import { useAnimationUpload } from "@/hooks/ui/use-animation-upload";
 
 interface ASCIIAnimatorProps {
   src: string;
   pantId?: string;
 }
 
-export function ASCIIAnimator({
-  src,
-  pantId,
-}: ASCIIAnimatorProps) {
+export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
   const [text, setText] = useState("");
   const animState = useAnimationState(pantId);
   const recorder = useAnimationRecorder();
@@ -98,8 +95,10 @@ export function ASCIIAnimator({
   const lines = useMemo(() => activeText.split("\n"), [activeText]);
 
   const baseColorClass = useMemo(() => {
-    if (animState.palette === "yellow") return "text-yellow-700 dark:text-yellow-500";
-    if (animState.palette === "green") return "text-green-700 dark:text-green-500";
+    if (animState.palette === "yellow")
+      return "text-yellow-700 dark:text-yellow-500";
+    if (animState.palette === "green")
+      return "text-green-700 dark:text-green-500";
     if (animState.palette === "blue") return "text-blue-700 dark:text-blue-400";
     return "text-foreground";
   }, [animState.palette]);
@@ -121,7 +120,8 @@ export function ASCIIAnimator({
     let y = 0;
     if (animState.mode === "lineWave")
       x = Math.sin(t + i * 0.6 * phaseScale) * animState.amplitude * amplScale;
-    if (animState.mode === "blockSway") x = Math.sin(t) * animState.amplitude * amplScale;
+    if (animState.mode === "blockSway")
+      x = Math.sin(t) * animState.amplitude * amplScale;
     if (animState.mode === "glitch")
       x =
         Math.sin(t * 2 + i * 1.3) * (animState.amplitude * 0.4) +
@@ -129,7 +129,10 @@ export function ASCIIAnimator({
     const style: React.CSSProperties = {
       transform: `translate(${x}px, ${y}px)`,
     };
-    if ((animState.mode === "colorCycle" || animState.palette === "rainbow") && !animState.gradient) {
+    if (
+      (animState.mode === "colorCycle" || animState.palette === "rainbow") &&
+      !animState.gradient
+    ) {
       const hue = (t * 60 + i * 20) % 360;
       style.color = `hsl(${hue}, 80%, 60%)`;
     }
@@ -139,7 +142,8 @@ export function ASCIIAnimator({
           {line.split("").map((ch, j) => {
             const isTarget =
               (animState.targetChar && ch === animState.targetChar) ||
-              (animState.targetSet && new Set(animState.targetSet.split("")).has(ch));
+              (animState.targetSet &&
+                new Set(animState.targetSet.split("")).has(ch));
             const cs: React.CSSProperties = {};
             if (isTarget && !animState.gradient) {
               if (animState.palette === "rainbow") {
@@ -212,7 +216,16 @@ export function ASCIIAnimator({
     const w = Math.max(400, maxLen * charW + pad * 2);
     const h = linesCount * charH + pad * 2;
     setCanvasSize({ w, h });
-  }, [lines, animState.mode, animState.palette, animState.speed, animState.amplitude, animState.gradient, animState.targetChar, animState.targetSet]);
+  }, [
+    lines,
+    animState.mode,
+    animState.palette,
+    animState.speed,
+    animState.amplitude,
+    animState.gradient,
+    animState.targetChar,
+    animState.targetSet,
+  ]);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -237,8 +250,10 @@ export function ASCIIAnimator({
       const amplScale = interactive ? 0.5 + pointerYRef.current : 1;
       let xOffset = 0;
       if (animState.mode === "lineWave")
-        xOffset = Math.sin(t + i * 0.6 * phaseScale) * animState.amplitude * amplScale;
-      if (animState.mode === "blockSway") xOffset = Math.sin(t) * animState.amplitude * amplScale;
+        xOffset =
+          Math.sin(t + i * 0.6 * phaseScale) * animState.amplitude * amplScale;
+      if (animState.mode === "blockSway")
+        xOffset = Math.sin(t) * animState.amplitude * amplScale;
       if (animState.mode === "glitch")
         xOffset =
           Math.sin(t * 2 + i * 1.3) * (animState.amplitude * 0.4) +
@@ -277,7 +292,10 @@ export function ASCIIAnimator({
           ctx.fillText(ch, pad + xOffset + j * 12, y);
         }
       } else {
-        if (animState.mode === "colorCycle" || animState.palette === "rainbow") {
+        if (
+          animState.mode === "colorCycle" ||
+          animState.palette === "rainbow"
+        ) {
           const hue = (t * 60 + i * 20) % 360;
           ctx.fillStyle = `hsl(${hue}, 80%, 60%)` as any;
         } else if (animState.palette === "yellow") ctx.fillStyle = "#a16207";
@@ -324,14 +342,16 @@ export function ASCIIAnimator({
   const handleUploadSnapshot = async () => {
     const c = canvasRef.current;
     if (!c) return;
-    const blob = await new Promise<Blob | null>((resolve) => c.toBlob(resolve, 'image/png'))
+    const blob = await new Promise<Blob | null>((resolve) =>
+      c.toBlob(resolve, "image/png")
+    );
     if (!blob) {
       upload.clearError();
       return;
     }
-    const file = new File([blob], 'snapshot.png', { type: 'image/png' })
-    await upload.uploadFile(file, animState.getSettings())
-  }
+    const file = new File([blob], "snapshot.png", { type: "image/png" });
+    await upload.uploadFile(file, animState.getSettings());
+  };
 
   const handleUploadWebM = async () => {
     if (!recorder.recordUrl) {
@@ -340,9 +360,9 @@ export function ASCIIAnimator({
     }
     const res = await fetch(recorder.recordUrl);
     const blob = await res.blob();
-    const file = new File([blob], 'animation.webm', { type: 'video/webm' })
-    await upload.uploadFile(file, animState.getSettings())
-  }
+    const file = new File([blob], "animation.webm", { type: "video/webm" });
+    await upload.uploadFile(file, animState.getSettings());
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -454,7 +474,9 @@ export function ASCIIAnimator({
           max={10}
           step={1}
           value={recorder.recordDuration}
-          onChange={(e) => recorder.setRecordDuration(parseFloat(e.target.value))}
+          onChange={(e) =>
+            recorder.setRecordDuration(parseFloat(e.target.value))
+          }
         />
         <button
           onClick={downloadSnapshot}
@@ -471,12 +493,20 @@ export function ASCIIAnimator({
             >
               download webm
             </a>
-            <button onClick={handleUploadWebM} disabled={upload.isUploading} className="font-mono text-xs px-2 py-1 border rounded bg-purple-600 text-white disabled:bg-purple-400">
+            <button
+              onClick={handleUploadWebM}
+              disabled={upload.isUploading}
+              className="font-mono text-xs px-2 py-1 border rounded bg-purple-600 text-white disabled:bg-purple-400"
+            >
               {upload.isUploading ? "uploading..." : "upload webm"}
             </button>
           </>
         )}
-        <button onClick={handleUploadSnapshot} disabled={upload.isUploading} className="font-mono text-xs px-2 py-1 border rounded disabled:opacity-50">
+        <button
+          onClick={handleUploadSnapshot}
+          disabled={upload.isUploading}
+          className="font-mono text-xs px-2 py-1 border rounded disabled:opacity-50"
+        >
           {upload.isUploading ? "uploading..." : "upload png"}
         </button>
         {upload.error && (
@@ -485,7 +515,13 @@ export function ASCIIAnimator({
           </span>
         )}
         {upload.uploadUrl && (
-          <a href={upload.uploadUrl} target="_blank" className="font-mono text-xs px-2 py-1 border rounded text-green-600">view upload</a>
+          <a
+            href={upload.uploadUrl}
+            target="_blank"
+            className="font-mono text-xs px-2 py-1 border rounded text-green-600"
+          >
+            view upload
+          </a>
         )}
       </div>
       <div

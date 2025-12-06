@@ -1,4 +1,4 @@
-import { ASCIIAnimator } from "@/components/ascii-animator";
+import { ASCIIAnimator } from "@/components/ascii/ascii-animator";
 import { PANTS_IDS } from "@/lib/pants";
 
 type PantId = (typeof PANTS_IDS)[number];

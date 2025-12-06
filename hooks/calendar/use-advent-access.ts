@@ -1,6 +1,6 @@
 'use client'
 
-import { useTokenBalance } from './use-token-balance'
+import { useTokenBalance } from '@/hooks/blockchain/use-token-balance'
 import { ADVENT_UNLOCK_THRESHOLDS } from '@/lib/blockchain'
 
 export function useAdventAccess(address?: string) {

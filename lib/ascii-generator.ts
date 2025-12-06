@@ -326,7 +326,8 @@ export class AsciiGenerator {
       variationTypes = [
         () => this.applyCharacterSubstitution(grid, template),
         () => this.applyDetailAddition(grid, template),
-        () => this.applyTextureVariation(grid, template)
+        () => this.applyTextureVariation(grid, template),
+        () => this.applyEmojiSubstitution(grid, template)
       ]
     } else if (this.variation === 'moderate') {
       // Moderate: balanced changes
@@ -334,7 +335,8 @@ export class AsciiGenerator {
         () => this.applyCharacterSubstitution(grid, template),
         () => this.applyDetailAddition(grid, template),
         () => this.applyLineModification(grid, template),
-        () => this.applyTextureVariation(grid, template)
+        () => this.applyTextureVariation(grid, template),
+        () => this.applyEmojiSubstitution(grid, template)
       ]
     } else {
       // Dramatic: focus on adding elements, not destroying structure
@@ -342,7 +344,8 @@ export class AsciiGenerator {
         () => this.applyDetailAddition(grid, template),
         () => this.applyTextureVariation(grid, template),
         () => this.applyLineModification(grid, template),
-        () => this.applyCharacterSubstitution(grid, template)
+        () => this.applyCharacterSubstitution(grid, template),
+        () => this.applyEmojiSubstitution(grid, template)
       ]
     }
     
@@ -606,6 +609,73 @@ export class AsciiGenerator {
     return false
   }
 
+  private applyEmojiSubstitution(grid: string[][], template: PantTemplate): boolean {
+    // Moon-themed emoji mappings for structural ASCII characters
+    const asciiToEmojiMap: Record<string, string[]> = {
+      'o': ['🌕', '🌝', '🌙', '◯', '●'],
+      'O': ['🌕', '🌝', '🌞', '◉', '⭕'],
+      '0': ['🌑', '🌚', '🌘', '🌗', '🌖'],
+      '(': ['🌙', '☽', '◔', '◕'],
+      ')': ['☾', '🌛', '◕', '◔'],
+      '{': ['🌜', '☽', '◧', '◨'],
+      '}': ['🌛', '☾', '◨', '◧'],
+      '[': ['🌙', '☽', '◀', '◁'],
+      ']': ['☾', '🌛', '▶', '▷'],
+      '|': ['🌙', '☾', '│', '┃'],
+      '/': ['🌙', '☾', '╱', '╲'],
+      '\\': ['🌙', '☾', '╲', '╱'],
+      '~': ['🌊', '🌙', '∼', '≈'],
+      '-': ['🌙', '☾', '─', '━']
+    }
+
+    // Find structural characters that can be replaced with emojis
+    const structuralChars: Array<{x: number, y: number, char: string}> = []
+    
+    for (let y = 0; y < grid.length; y++) {
+      for (let x = 0; x < grid[y].length; x++) {
+        const char = grid[y][x]
+        // Only replace structural characters, not detail/texture characters
+        if (asciiToEmojiMap[char] && this.isStructuralCharacter(char, template)) {
+          structuralChars.push({x, y, char})
+        }
+      }
+    }
+
+    if (structuralChars.length === 0) return false
+
+    // Apply emoji substitution to a subset of structural characters
+    // Higher complexity = more emoji substitutions
+    const substitutionRate = Math.min(0.3 + (this.complexity * 0.1), 0.8) // 30% to 80% based on complexity
+    const charsToReplace = Math.ceil(structuralChars.length * substitutionRate)
+    
+    // Shuffle and select characters to replace
+    const shuffledChars = this.shuffleArray(structuralChars, 2000)
+    const selectedChars = shuffledChars.slice(0, charsToReplace)
+
+    selectedChars.forEach(({x, y, char}) => {
+      const emojiOptions = asciiToEmojiMap[char]
+      const randomEmoji = emojiOptions[Math.floor(this.seededRandom(x * 1000 + y) * emojiOptions.length)]
+      grid[y][x] = randomEmoji
+    })
+
+    return true
+  }
+
+  private isStructuralCharacter(char: string, template: PantTemplate): boolean {
+    // Structural characters are those that define the main shape/form
+    const structuralChars = ['o', 'O', '0', '(', ')', '{', '}', '[', ']', '|', '/', '\\', '~', '-']
+    return structuralChars.includes(char) && template.allowedChars.includes(char)
+  }
+
+  private shuffleArray<T>(array: T[], seedOffset: number): T[] {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(this.seededRandom(seedOffset + i) * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
   private calculateThemePreservation(original: string[][], modified: string[][], template: PantTemplate): number {
     let preservedElements = 0
     let totalElements = 0
@@ -648,6 +718,20 @@ export class AsciiGenerator {
     const detailChars = ['.', '*', '\'', '`', ':', ',']
     const curveChars = ['(', ')', '{', '}', '[', ']', 'C', 'c', 's', 'S']
     const angularChars = ['/', '\\', 'V', 'v', 'L', 'l', 'A', '^']
+    
+    // Check if characters are emojis (Unicode code points outside basic multilingual plane)
+    const isEmoji = (char: string) => {
+      if (char.length > 1) return true // Multi-character strings are likely emojis
+      const code = char.codePointAt(0) || 0
+      return code > 0xFFFF // Basic multilingual plane ends at U+FFFF
+    }
+    
+    // Emoji similarity - if both are emojis, they're thematically similar
+    if (isEmoji(char1) && isEmoji(char2)) return true
+    
+    // Emoji to ASCII similarity - check if emoji maps to the original ASCII character
+    if (isEmoji(char1) && lunarChars.includes(char2)) return true
+    if (isEmoji(char2) && lunarChars.includes(char1)) return true
     
     // Lunar theme similarity
     if (lunarChars.includes(char1) && lunarChars.includes(char2)) return true

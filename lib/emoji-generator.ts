@@ -6,21 +6,27 @@
  */
 
 export type EmojiTheme = 'lunar' | 'phases' | 'crescent' | 'full';
+export type EmojiVariation = 'subtle' | 'moderate' | 'dramatic';
 
 export interface EmojiSubstitutionParams {
   text: string;
+  seed?: string; // For reproducible results
   complexity: number; // 1-10 scale
   theme: EmojiTheme;
+  variation?: EmojiVariation; // Controls transformation strategy
 }
 
 export interface GeneratedEmoji {
   art: string;
   metadata: {
+    seed: string;
     theme: EmojiTheme;
+    variation: EmojiVariation;
     complexity: number;
     substitutionRate: number;
     charactersSubstituted: number;
     totalCharactersEligible: number;
+    transformationStrategies: string[]; // Which strategies were used
     themeIntegrity: number; // percentage of characters that are moon-themed
   };
 }
@@ -111,6 +117,17 @@ const MOON_EMOJIS = new Set([
 ]);
 
 /**
+ * Structural characters that should rarely be transformed
+ * These maintain the shape and alignment of the ASCII art
+ */
+const PROTECTED_CHARS = new Set(['|', '/', '\\', '_', '-', '=']);
+
+/**
+ * Character that frequently appear in boundaries and should be protected
+ */
+const STRUCTURAL_CHARS = new Set(['(', ')', '{', '}', '[', ']']);
+
+/**
  * Validates theme parameter
  */
 function isValidTheme(theme: string): theme is EmojiTheme {
@@ -138,6 +155,25 @@ export function getThemeDescription(theme: EmojiTheme): string {
 }
 
 /**
+ * Get available variation types
+ */
+export function getAvailableVariations(): EmojiVariation[] {
+  return ['subtle', 'moderate', 'dramatic'];
+}
+
+/**
+ * Get variation description for UI
+ */
+export function getVariationDescription(variation: EmojiVariation): string {
+  const descriptions: Record<EmojiVariation, string> = {
+    subtle: 'Minimal changes, preserves structure (15-55%)',
+    moderate: 'Balanced emoji integration (25-90%)',
+    dramatic: 'Aggressive transformation (40-95%)',
+  };
+  return descriptions[variation];
+}
+
+/**
  * Deterministic seeded hash for consistent selection
  */
 function hashPosition(text: string, lineIndex: number, charIndex: number, complexity: number): number {
@@ -153,7 +189,7 @@ function hashPosition(text: string, lineIndex: number, charIndex: number, comple
 
 /**
  * Main substitution algorithm - follows ascii-generator pattern
- * Makes deterministic character transformations based on complexity
+ * Makes deterministic character transformations based on complexity and variation
  */
 export function substituteEmojis(
   params: EmojiSubstitutionParams
@@ -166,11 +202,21 @@ export function substituteEmojis(
     throw new Error('Complexity must be between 1 and 10');
   }
 
+  // Generate consistent seed if not provided
+  const seed = params.seed || `emoji-${Date.now()}-${Math.random()}`;
+  const variation = params.variation || 'moderate';
   const emojiMap = EMOJI_THEMES[params.theme];
   const lines = params.text.split('\n');
   
-  // Complexity determines selection probability (1=20%, 10=95%)
-  const selectionProbability = 0.2 + (params.complexity * 0.075);
+  // Variation determines selection probability and strategies
+  const probabilityByVariation: Record<EmojiVariation, number> = {
+    subtle: 0.15 + (params.complexity * 0.04), // 15-55%
+    moderate: 0.25 + (params.complexity * 0.065), // 25-90%
+    dramatic: 0.4 + (params.complexity * 0.055), // 40-95%
+  };
+  
+  const selectionProbability = Math.min(probabilityByVariation[variation], 0.95);
+  const usedStrategies: Set<string> = new Set();
 
   let totalEligibleChars = 0;
   let totalSubstitutedChars = 0;
@@ -185,14 +231,40 @@ export function substituteEmojis(
 
       totalEligibleChars++;
 
+      // Determine transformation probability based on character type and variation
+      let transformProbability = selectionProbability;
+      
+      // Protected structural chars have lower transformation chance
+      if (PROTECTED_CHARS.has(char)) {
+        transformProbability *= variation === 'subtle' ? 0.3 : variation === 'moderate' ? 0.5 : 0.7;
+        usedStrategies.add('structural-protection');
+      }
+
       // Use deterministic seeding to decide whether to transform this character
-      const posHash = hashPosition(params.text, lineIndex, charIndex, params.complexity);
+      const posHash = hashPosition(seed, lineIndex, charIndex, params.complexity);
       const selectValue = (posHash % 100) / 100; // Normalize to 0-1
 
-      if (selectValue < selectionProbability) {
-        // Transform this character
-        const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
-        chars[charIndex] = emojiOptions[variantIndex];
+      if (selectValue < transformProbability) {
+        // Apply strategy based on variation
+        const strategyValue = ((posHash / 100) % 3);
+        
+        if (variation === 'subtle' || strategyValue < 1) {
+          // Strategy 1: Simple emoji substitution
+          const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+          chars[charIndex] = emojiOptions[variantIndex];
+          usedStrategies.add('substitution');
+        } else if (variation === 'dramatic' && strategyValue < 2.5 && STRUCTURAL_CHARS.has(char)) {
+          // Strategy 2: Thematic pairing (for brackets in dramatic mode)
+          const variantIndex = Math.floor((posHash / 50) % emojiOptions.length);
+          chars[charIndex] = emojiOptions[variantIndex];
+          usedStrategies.add('thematic-pairing');
+        } else {
+          // Default back to substitution
+          const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+          chars[charIndex] = emojiOptions[variantIndex];
+          usedStrategies.add('substitution');
+        }
+        
         totalSubstitutedChars++;
       }
     });
@@ -219,11 +291,14 @@ export function substituteEmojis(
   return {
     art: resultLines.join('\n'),
     metadata: {
+      seed,
       theme: params.theme,
+      variation,
       complexity: params.complexity,
       substitutionRate: parseFloat((actualSubstitutionRate * 100).toFixed(1)),
       charactersSubstituted: totalSubstitutedChars,
       totalCharactersEligible: totalEligibleChars,
+      transformationStrategies: Array.from(usedStrategies),
       themeIntegrity: Math.round(themeIntegrity),
     },
   };

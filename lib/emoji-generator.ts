@@ -169,8 +169,8 @@ export function substituteEmojis(
   const emojiMap = EMOJI_THEMES[params.theme];
   const lines = params.text.split('\n');
   
-  // Calculate substitution rate: lower complexity = less substitution
-  const substitutionRate = Math.min(0.2 + (params.complexity * 0.075), 0.85);
+  // Calculate substitution rate: lower complexity = less substitution, max ~98% at 10
+  const substitutionRate = Math.min(0.15 + (params.complexity * 0.085), 0.98);
 
   let totalEligibleChars = 0;
   let totalSubstitutedChars = 0;

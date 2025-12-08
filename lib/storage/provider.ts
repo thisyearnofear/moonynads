@@ -7,7 +7,7 @@ export interface AnimationSettings {
   targetChar: string
   targetSet: string
   emojiEnabled?: boolean
-  emojiTheme?: 'lunar' | 'nature' | 'abstract' | 'random'
+  emojiTheme?: 'lunar' | 'phases' | 'crescent' | 'full'
   emojiComplexity?: number
 }
 

@@ -606,9 +606,9 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
                   className="font-mono text-xs px-2 py-1 border rounded"
                 >
                   <option value="lunar">lunar</option>
-                  <option value="nature">nature</option>
-                  <option value="abstract">abstract</option>
-                  <option value="random">random</option>
+                  <option value="phases">phases</option>
+                  <option value="crescent">crescent</option>
+                  <option value="full">full</option>
                 </select>
                 <label className="font-mono text-xs">complexity</label>
                 <input

@@ -580,10 +580,10 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
       <div className="mt-6 pixel-border rounded-lg bg-card">
         <div className="px-4 py-3 border-b border-border">
           <h3 className="font-mono text-sm font-bold text-yellow-700 dark:text-yellow-500">
-            🍑 EMOJI GENERATOR
+            🌙 LUNAR EMOJI GENERATOR
           </h3>
           <p className="font-mono text-xs text-foreground/70 mt-1">
-            Transform ASCII characters into themed emojis
+            Transform ASCII art into authentic moon-themed emoji variations
           </p>
         </div>
         <div className="p-4">
@@ -604,11 +604,13 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
                   value={emojiSubstitution.theme}
                   onChange={(e) => emojiSubstitution.setTheme(e.target.value as any)}
                   className="font-mono text-xs px-2 py-1 border rounded"
+                  title={emojiSubstitution.getThemeDescription(emojiSubstitution.theme)}
                 >
-                  <option value="lunar">lunar</option>
-                  <option value="phases">phases</option>
-                  <option value="crescent">crescent</option>
-                  <option value="full">full</option>
+                  {emojiSubstitution.getAvailableThemes().map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
                 </select>
                 <label className="font-mono text-xs">complexity</label>
                 <input
@@ -618,6 +620,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
                   step={1}
                   value={emojiSubstitution.complexity}
                   onChange={(e) => emojiSubstitution.setComplexity(parseInt(e.target.value))}
+                  title={`Substitution rate: ${emojiSubstitution.metadata?.substitutionRate}%`}
                 />
                 <span className="font-mono text-xs">{emojiSubstitution.complexity}</span>
                 <button
@@ -644,9 +647,38 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
             )}
           </div>
           {emojiSubstitution.isSubstituted && (
-            <div className="pixel-border p-3 rounded bg-background/70 font-mono text-xs overflow-x-auto whitespace-pre">
-              {emojiSubstitution.substitutedText}
-            </div>
+            <>
+              <div className="pixel-border p-3 rounded bg-background/70 font-mono text-xs overflow-x-auto whitespace-pre">
+                {emojiSubstitution.substitutedText}
+              </div>
+              {emojiSubstitution.metadata && (
+                <div className="mt-2 text-xs text-foreground/60 grid grid-cols-2 gap-2 md:grid-cols-4">
+                  <div>
+                    <span className="text-foreground/50">Substituted:</span>
+                    <div className="font-mono">
+                      {emojiSubstitution.metadata.charactersSubstituted}/
+                      {emojiSubstitution.metadata.totalCharactersEligible}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-foreground/50">Rate:</span>
+                    <div className="font-mono">
+                      {Math.round(emojiSubstitution.metadata.substitutionRate * 100)}%
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-foreground/50">Theme:</span>
+                    <div className="font-mono">{emojiSubstitution.metadata.theme}</div>
+                  </div>
+                  <div>
+                    <span className="text-foreground/50">Integrity:</span>
+                    <div className="font-mono">
+                      {emojiSubstitution.metadata.themeIntegrity}%
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

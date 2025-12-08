@@ -1,173 +1,94 @@
 import { useState, useCallback, useEffect } from 'react';
+import {
+  substituteEmojis,
+  getAvailableThemes,
+  getThemeDescription,
+  EmojiTheme,
+  type GeneratedEmoji,
+} from '@/lib/emoji-generator';
 
-interface EmojiSubstitutionParams {
-  text: string;
-  complexity?: number;
-  theme?: 'lunar' | 'phases' | 'crescent' | 'full';
-  enabled?: boolean;
-}
-
-interface EmojiSubstitutionResult {
+export interface EmojiSubstitutionResult {
   substitutedText: string;
   isSubstituted: boolean;
   complexity: number;
-  theme: 'lunar' | 'phases' | 'crescent' | 'full';
+  theme: EmojiTheme;
+  metadata: GeneratedEmoji['metadata'] | null;
   toggleSubstitution: () => void;
   setComplexity: (complexity: number) => void;
-  setTheme: (theme: 'lunar' | 'phases' | 'crescent' | 'full') => void;
+  setTheme: (theme: EmojiTheme) => void;
   resetToOriginal: () => void;
+  getThemeDescription: (theme: EmojiTheme) => string;
+  getAvailableThemes: () => EmojiTheme[];
 }
 
-// Emoji mappings - all lunar/moon themed
-const EMOJI_THEMES = {
-  lunar: {
-    'o': ['🌕', '🌝', '🌙', '◯', '●'],
-    'O': ['🌕', '🌝', '🌞', '◉', '⭕'],
-    '0': ['🌑', '🌚', '🌘', '🌗', '🌖'],
-    '(': ['🌙', '☽', '◔', '◕'],
-    ')': ['☾', '🌛', '◕', '◔'],
-    '{': ['🌜', '☽', '◧', '◨'],
-    '}': ['🌛', '☾', '◨', '◧'],
-    '[': ['🌙', '☽', '◀', '◁'],
-    ']': ['☾', '🌛', '▶', '▷'],
-    '|': ['🌙', '☾', '│', '┃'],
-    '/': ['🌙', '☾', '╱', '╲'],
-    '\\': ['🌙', '☾', '╲', '╱'],
-    '~': ['🌊', '🌙', '∼', '≈'],
-    '-': ['🌙', '☾', '─', '━']
-  },
-  phases: {
-    'o': ['🌕', '🌖', '🌗', '🌘', '🌑'],
-    'O': ['🌕', '🌝', '🌞', '🌛', '🌜'],
-    '0': ['🌑', '🌒', '🌓', '🌔', '🌕'],
-    '(': ['🌙', '🌛', '☽', '◐', '◑'],
-    ')': ['🌙', '🌜', '☾', '◑', '◐'],
-    '{': ['🌜', '🌘', '☽', '◧', '◨'],
-    '}': ['🌛', '🌖', '☾', '◨', '◧'],
-    '[': ['🌙', '🌒', '☽', '◀', '◁'],
-    ']': ['🌙', '🌔', '☾', '▶', '▷'],
-    '|': ['🌕', '🌑', '│', '┃', '║'],
-    '/': ['🌙', '🌜', '╱', '⧸', '/'],
-    '\\': ['🌙', '🌛', '╲', '⧹', '\\'],
-    '~': ['🌊', '🌙', '≈', '∼', '~'],
-    '-': ['🌙', '─', '━', '—', '–']
-  },
-  crescent: {
-    'o': ['🌙', '☽', '☾', '◯', '○'],
-    'O': ['🌙', '🌛', '🌜', '◉', '⭕'],
-    '0': ['🌑', '🌘', '🌒', '●', '○'],
-    '(': ['🌙', '🌛', '☽', '◐', '('],
-    ')': ['🌙', '🌜', '☾', '◑', ')'],
-    '{': ['🌜', '☽', '◧', '{', '⦃'],
-    '}': ['🌛', '☾', '◨', '}', '⦄'],
-    '[': ['🌙', '☽', '◀', '[', '⟦'],
-    ']': ['🌙', '☾', '▶', ']', '⟧'],
-    '|': ['🌙', '│', '┃', '║', '|'],
-    '/': ['🌙', '╱', '⧸', '/', '⁄'],
-    '\\': ['🌙', '╲', '⧹', '\\', '∖'],
-    '~': ['🌙', '≈', '∼', '~', '≋'],
-    '-': ['🌙', '─', '━', '—', '-']
-  },
-  full: {
-    'o': ['🌕', '🌝', '◯', '○', '⭕'],
-    'O': ['🌕', '🌝', '🌞', '◉', '⊙'],
-    '0': ['🌕', '🌝', '●', '⬤', '⚫'],
-    '(': ['🌕', '◐', '◔', '◕', '('],
-    ')': ['🌕', '◑', '◕', '◔', ')'],
-    '{': ['🌕', '◧', '⦃', '{', '⦗'],
-    '}': ['🌕', '◨', '⦄', '}', '⦘'],
-    '[': ['🌕', '◀', '⟦', '[', '⦋'],
-    ']': ['🌕', '▶', '⟧', ']', '⦌'],
-    '|': ['🌕', '│', '┃', '║', '|'],
-    '/': ['🌕', '╱', '⧸', '/', '⁄'],
-    '\\': ['🌕', '╲', '⧹', '\\', '∖'],
-    '~': ['🌕', '≈', '∼', '~', '≋'],
-    '-': ['🌕', '─', '━', '—', '-']
-  }
-};
-
 /**
- * Generates a seeded random number based on string input
+ * React hook for lunar emoji substitution
+ * Thin wrapper around lib/emoji-generator business logic
+ * Manages state and side effects only
  */
-const seededRandom = (str: string): number => {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return Math.abs(hash) / 2147483648; // Normalize to [0,1]
-};
-
-export const useEmojiSubstitution = (initialText: string): EmojiSubstitutionResult => {
+export const useEmojiSubstitution = (
+  initialText: string
+): EmojiSubstitutionResult => {
   const [enabled, setEnabled] = useState(false);
   const [complexity, setComplexity] = useState(5);
-  const [theme, setTheme] = useState<'lunar' | 'phases' | 'crescent' | 'full'>('lunar');
+  const [theme, setTheme] = useState<EmojiTheme>('lunar');
   const [substitutedText, setSubstitutedText] = useState(initialText);
+  const [metadata, setMetadata] = useState<GeneratedEmoji['metadata'] | null>(
+    null
+  );
 
-  const applyEmojiSubstitution = useCallback((text: string, complexityValue: number, themeKey: string): string => {
-    const emojiMap = EMOJI_THEMES[themeKey as keyof typeof EMOJI_THEMES] || EMOJI_THEMES.lunar;
-    const lines = text.split('\n');
-    const substitutionRate = Math.min(0.3 + (complexityValue * 0.07), 0.8);
-
-    const resultLines = lines.map(line => {
-      const chars = line.split('');
-      const positions: { index: number; char: string }[] = [];
-
-      chars.forEach((char, index) => {
-        if (emojiMap[char as keyof typeof emojiMap]) {
-          positions.push({ index, char });
-        }
-      });
-
-      const shuffledPositions = [...positions].sort((a, b) => seededRandom(`${text}-${a.index}`) - seededRandom(`${text}-${b.index}`));
-      const charsToReplace = Math.ceil(positions.length * substitutionRate);
-
-      shuffledPositions.slice(0, charsToReplace).forEach(({ index, char }) => {
-        const emojiOptions = emojiMap[char as keyof typeof emojiMap];
-        const randomIndex = Math.floor(seededRandom(`${text}-${index}-${complexityValue}-${themeKey}`) * emojiOptions.length);
-        chars[index] = emojiOptions[randomIndex];
-      });
-
-      return chars.join('');
-    });
-
-    return resultLines.join('\n');
-  }, []);
+  // Apply emoji substitution whenever text, complexity, or theme changes
+  useEffect(() => {
+    if (enabled) {
+      try {
+        const result = substituteEmojis({
+          text: initialText,
+          complexity,
+          theme,
+        });
+        setSubstitutedText(result.art);
+        setMetadata(result.metadata);
+      } catch (error) {
+        console.error('Emoji substitution error:', error);
+        setSubstitutedText(initialText);
+        setMetadata(null);
+      }
+    } else {
+      setSubstitutedText(initialText);
+      setMetadata(null);
+    }
+  }, [initialText, enabled, complexity, theme]);
 
   const toggleSubstitution = useCallback(() => {
-    setEnabled(prev => !prev);
+    setEnabled((prev) => !prev);
   }, []);
 
   const resetToOriginal = useCallback(() => {
     setEnabled(false);
+    setComplexity(5);
+    setTheme('lunar');
   }, []);
 
   const setComplexityCallback = useCallback((newComplexity: number) => {
-    setComplexity(newComplexity);
+    const clamped = Math.max(1, Math.min(10, newComplexity));
+    setComplexity(clamped);
   }, []);
 
-  const setThemeCallback = useCallback((newTheme: 'lunar' | 'phases' | 'crescent' | 'full') => {
+  const setThemeCallback = useCallback((newTheme: EmojiTheme) => {
     setTheme(newTheme);
   }, []);
-
-  useEffect(() => {
-    if (enabled) {
-      const newText = applyEmojiSubstitution(initialText, complexity, theme);
-      setSubstitutedText(newText);
-    } else {
-      setSubstitutedText(initialText);
-    }
-  }, [initialText, enabled, complexity, theme, applyEmojiSubstitution]);
 
   return {
     substitutedText,
     isSubstituted: enabled,
     complexity,
     theme,
+    metadata,
     toggleSubstitution,
     setComplexity: setComplexityCallback,
     setTheme: setThemeCallback,
-    resetToOriginal
+    resetToOriginal,
+    getThemeDescription,
+    getAvailableThemes,
   };
 };

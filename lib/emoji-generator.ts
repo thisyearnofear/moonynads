@@ -275,30 +275,40 @@ export function substituteEmojis(
         // Apply strategy based on variation
         const strategyValue = ((posHash / 100) % 3);
         
-        if (variation === 'subtle' || strategyValue < 1) {
-          // Strategy 1: Simple emoji substitution
-          emojiOptions = blendThemes(char, params.theme, posHash);
+        if (variation === 'subtle') {
+          // Subtle: Simple emoji substitution only
           const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
           chars[charIndex] = emojiOptions[variantIndex];
           usedStrategies.add('substitution');
-        } else if (variation === 'dramatic' && strategyValue < 2) {
-          // Strategy 2: Theme blending (richer variety)
+        } else if (variation === 'moderate') {
+          // Moderate: Theme blending for richer variety
           emojiOptions = blendThemes(char, params.theme, posHash);
           const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
           chars[charIndex] = emojiOptions[variantIndex];
           usedStrategies.add('theme-blending');
-        } else if (variation === 'dramatic' && strategyValue >= 2 && STRUCTURAL_CHARS.has(char)) {
-          // Strategy 3: Density variation - double up for visual impact in dramatic mode
-          emojiOptions = blendThemes(char, params.theme, posHash);
-          const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
-          chars[charIndex] = emojiOptions[variantIndex] + emojiOptions[(variantIndex + 1) % emojiOptions.length];
-          usedStrategies.add('density-variation');
-          totalSubstitutedChars++; // Count as 2 for metrics
-        } else {
-          // Default back to substitution
-          const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
-          chars[charIndex] = emojiOptions[variantIndex];
-          usedStrategies.add('substitution');
+        } else if (variation === 'dramatic') {
+          // Dramatic: Multiple strategies for maximum visual impact
+          if (strategyValue < 1.5) {
+            // Strategy: Theme blending
+            emojiOptions = blendThemes(char, params.theme, posHash);
+            const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+            chars[charIndex] = emojiOptions[variantIndex];
+            usedStrategies.add('theme-blending');
+          } else if (strategyValue < 2.5 && STRUCTURAL_CHARS.has(char)) {
+            // Strategy: Density variation - double up for visual impact
+            emojiOptions = blendThemes(char, params.theme, posHash);
+            const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+            const nextIndex = (variantIndex + 1) % emojiOptions.length;
+            chars[charIndex] = emojiOptions[variantIndex] + emojiOptions[nextIndex];
+            usedStrategies.add('density-variation');
+            totalSubstitutedChars++; // Count as 2 for metrics
+          } else {
+            // Strategy: Substitution with blending
+            emojiOptions = blendThemes(char, params.theme, posHash);
+            const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+            chars[charIndex] = emojiOptions[variantIndex];
+            usedStrategies.add('substitution');
+          }
         }
         
         totalSubstitutedChars++;

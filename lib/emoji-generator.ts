@@ -111,20 +111,6 @@ const MOON_EMOJIS = new Set([
 ]);
 
 /**
- * Generates a seeded random number based on string input
- * Ensures deterministic results for same inputs
- */
-function seededRandom(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return Math.abs(hash) / 2147483648; // Normalize to [0,1]
-}
-
-/**
  * Validates theme parameter
  */
 function isValidTheme(theme: string): theme is EmojiTheme {
@@ -152,8 +138,22 @@ export function getThemeDescription(theme: EmojiTheme): string {
 }
 
 /**
- * Main substitution algorithm
- * Applies lunar emoji substitutions to ASCII art with deterministic behavior
+ * Deterministic seeded hash for consistent selection
+ */
+function hashPosition(text: string, lineIndex: number, charIndex: number, complexity: number): number {
+  const input = `${text}-line${lineIndex}-char${charIndex}-complex${complexity}`;
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    const char = input.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Main substitution algorithm - follows ascii-generator pattern
+ * Makes deterministic character transformations based on complexity
  */
 export function substituteEmojis(
   params: EmojiSubstitutionParams
@@ -169,59 +169,38 @@ export function substituteEmojis(
   const emojiMap = EMOJI_THEMES[params.theme];
   const lines = params.text.split('\n');
   
-  // Calculate substitution rate: lower complexity = less substitution, max ~98% at 10
-  const substitutionRate = Math.min(0.15 + (params.complexity * 0.085), 0.98);
+  // Complexity determines selection probability (1=20%, 10=95%)
+  const selectionProbability = 0.2 + (params.complexity * 0.075);
 
   let totalEligibleChars = 0;
   let totalSubstitutedChars = 0;
 
   const resultLines = lines.map((line, lineIndex) => {
     const chars = line.split('');
-    const positions: { index: number; char: string }[] = [];
 
-    // Find all characters that can be substituted
-    chars.forEach((char, index) => {
-      if (emojiMap[char as keyof typeof emojiMap]) {
-        positions.push({ index, char });
-        totalEligibleChars++;
-      }
-    });
-
-    if (positions.length === 0) return line;
-
-    // Deterministically select which positions to replace
-    const charsToReplace = Math.ceil(positions.length * substitutionRate);
-    const selectedIndices = new Set<number>();
-
-    // Use seeded randomness for consistent, distributed selection
-    for (let i = 0; i < charsToReplace && i < positions.length; i++) {
-      const seed = seededRandom(
-        `${params.theme}-${lineIndex}-${params.complexity}-${i}-${params.text.length}`
-      );
-      const posIndex = Math.floor(seed * positions.length);
-      if (!selectedIndices.has(posIndex)) {
-        selectedIndices.add(posIndex);
-      }
-    }
-
-    // Apply substitutions
-    selectedIndices.forEach((posIndex) => {
-      const { index, char } = positions[posIndex];
+    chars.forEach((char, charIndex) => {
+      // Only consider characters in our emoji map
       const emojiOptions = emojiMap[char as keyof typeof emojiMap];
-      
-      // Deterministically select emoji variant
-      const variantSeed = seededRandom(
-        `${char}-${index}-${lineIndex}-${params.complexity}`
-      );
-      const randomIndex = Math.floor(variantSeed * emojiOptions.length);
-      chars[index] = emojiOptions[randomIndex];
-      totalSubstitutedChars++;
+      if (!emojiOptions) return;
+
+      totalEligibleChars++;
+
+      // Use deterministic seeding to decide whether to transform this character
+      const posHash = hashPosition(params.text, lineIndex, charIndex, params.complexity);
+      const selectValue = (posHash % 100) / 100; // Normalize to 0-1
+
+      if (selectValue < selectionProbability) {
+        // Transform this character
+        const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+        chars[charIndex] = emojiOptions[variantIndex];
+        totalSubstitutedChars++;
+      }
     });
 
     return chars.join('');
   });
 
-  // Calculate theme integrity (percentage of output that is moon-themed)
+  // Calculate theme integrity (percentage of substituted chars that are moon-themed)
   const resultText = resultLines.join('\n');
   let moonEmojiCount = 0;
   for (const char of resultText) {
@@ -231,14 +210,18 @@ export function substituteEmojis(
   }
   const themeIntegrity = totalSubstitutedChars > 0 
     ? (moonEmojiCount / totalSubstitutedChars) * 100
-    : 100; // Empty or no substitutions = perfect integrity
+    : 100;
+
+  const actualSubstitutionRate = totalEligibleChars > 0
+    ? totalSubstitutedChars / totalEligibleChars
+    : 0;
 
   return {
     art: resultLines.join('\n'),
     metadata: {
       theme: params.theme,
       complexity: params.complexity,
-      substitutionRate: parseFloat(substitutionRate.toFixed(2)),
+      substitutionRate: parseFloat((actualSubstitutionRate * 100).toFixed(1)),
       charactersSubstituted: totalSubstitutedChars,
       totalCharactersEligible: totalEligibleChars,
       themeIntegrity: Math.round(themeIntegrity),

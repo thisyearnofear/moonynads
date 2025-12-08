@@ -101,34 +101,28 @@ const seededRandom = (str: string): number => {
 
 export const useEmojiSubstitution = (initialText: string): EmojiSubstitutionResult => {
   const [enabled, setEnabled] = useState(false);
-  const [complexity, setComplexity] = useState(5); // Default to medium complexity
+  const [complexity, setComplexity] = useState(5);
   const [theme, setTheme] = useState<'lunar' | 'nature' | 'abstract' | 'random'>('lunar');
   const [substitutedText, setSubstitutedText] = useState(initialText);
-  const [originalText, setOriginalText] = useState(initialText);
 
   const applyEmojiSubstitution = useCallback((text: string, complexityValue: number, themeKey: string): string => {
     const emojiMap = EMOJI_THEMES[themeKey as keyof typeof EMOJI_THEMES] || EMOJI_THEMES.lunar;
     const lines = text.split('\n');
-
-    // Calculate substitution rate based on complexity (30% to 80%)
     const substitutionRate = Math.min(0.3 + (complexityValue * 0.07), 0.8);
 
     const resultLines = lines.map(line => {
       const chars = line.split('');
       const positions: { index: number; char: string }[] = [];
 
-      // Find all characters that can be substituted
       chars.forEach((char, index) => {
         if (emojiMap[char as keyof typeof emojiMap]) {
           positions.push({ index, char });
         }
       });
 
-      // Randomly select positions to substitute based on substitution rate
       const shuffledPositions = [...positions].sort((a, b) => seededRandom(`${text}-${a.index}`) - seededRandom(`${text}-${b.index}`));
       const charsToReplace = Math.ceil(positions.length * substitutionRate);
 
-      // Apply substitutions
       shuffledPositions.slice(0, charsToReplace).forEach(({ index, char }) => {
         const emojiOptions = emojiMap[char as keyof typeof emojiMap];
         const randomIndex = Math.floor(seededRandom(`${text}-${index}-${complexityValue}-${themeKey}`) * emojiOptions.length);
@@ -142,58 +136,32 @@ export const useEmojiSubstitution = (initialText: string): EmojiSubstitutionResu
   }, []);
 
   const toggleSubstitution = useCallback(() => {
-    setEnabled(prev => {
-      const newEnabled = !prev;
-      if (newEnabled) {
-        const newText = applyEmojiSubstitution(originalText, complexity, theme);
-        setSubstitutedText(newText);
-      } else {
-        setSubstitutedText(originalText);
-      }
-      return newEnabled;
-    });
-  }, [applyEmojiSubstitution, originalText, complexity, theme]);
+    setEnabled(prev => !prev);
+  }, []);
 
   const resetToOriginal = useCallback(() => {
     setEnabled(false);
-    setSubstitutedText(originalText);
-  }, [originalText]);
-
-  const updateSubstitution = useCallback(() => {
-    if (enabled) {
-      const newText = applyEmojiSubstitution(originalText, complexity, theme);
-      setSubstitutedText(newText);
-    }
-  }, [enabled, applyEmojiSubstitution, originalText, complexity, theme]);
+  }, []);
 
   const setComplexityCallback = useCallback((newComplexity: number) => {
     setComplexity(newComplexity);
-    // Only update substitution if currently enabled
-    if (enabled) {
-      const newText = applyEmojiSubstitution(originalText, newComplexity, theme);
-      setSubstitutedText(newText);
-    }
-  }, [enabled, applyEmojiSubstitution, originalText, theme]);
+  }, []);
 
   const setThemeCallback = useCallback((newTheme: 'lunar' | 'nature' | 'abstract' | 'random') => {
     setTheme(newTheme);
-    // Only update substitution if currently enabled
-    if (enabled) {
-      const newText = applyEmojiSubstitution(originalText, complexity, newTheme);
-      setSubstitutedText(newText);
-    }
-  }, [enabled, applyEmojiSubstitution, originalText, complexity]);
+  }, []);
 
-  // When original text changes, update if currently enabled
   useEffect(() => {
     if (enabled) {
-      const newText = applyEmojiSubstitution(originalText, complexity, theme);
+      const newText = applyEmojiSubstitution(initialText, complexity, theme);
       setSubstitutedText(newText);
+    } else {
+      setSubstitutedText(initialText);
     }
-  }, [originalText, enabled, applyEmojiSubstitution, complexity, theme]);
+  }, [initialText, enabled, complexity, theme, applyEmojiSubstitution]);
 
   return {
-    substitutedText: enabled ? substitutedText : originalText,
+    substitutedText,
     isSubstituted: enabled,
     complexity,
     theme,

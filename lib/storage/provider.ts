@@ -6,6 +6,9 @@ export interface AnimationSettings {
   gradient: boolean
   targetChar: string
   targetSet: string
+  emojiEnabled?: boolean
+  emojiTheme?: 'lunar' | 'nature' | 'abstract' | 'random'
+  emojiComplexity?: number
 }
 
 export interface StoreResult {

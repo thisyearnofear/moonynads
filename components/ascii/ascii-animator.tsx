@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useAnimationState } from "@/hooks/ui/use-animation-state";
 import { useAnimationRecorder } from "@/hooks/ui/use-animation-recorder";
 import { useAnimationUpload } from "@/hooks/ui/use-animation-upload";
+import { useEmojiSubstitution } from "@/hooks/ascii/use-emoji-substitution";
 
 interface ASCIIAnimatorProps {
   src: string;
@@ -15,6 +16,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
   const animState = useAnimationState(pantId);
   const recorder = useAnimationRecorder();
   const upload = useAnimationUpload();
+  const emojiSubstitution = useEmojiSubstitution(text);
   const [paused, setPaused] = useState(false);
   const [tick, setTick] = useState(0);
   const [interactive, setInteractive] = useState(true);
@@ -83,14 +85,151 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     };
   }, [paused]);
 
+  const [emojiFrames, setEmojiFrames] = useState<string[]>([]);
+
+  // Update emoji frames when frames or emoji settings change
+  useEffect(() => {
+    if (emojiSubstitution.isSubstituted && frames.length > 0) {
+      const newEmojiFrames = frames.map(frame =>
+        applyEmojiSubstitutionToText(frame, emojiSubstitution.complexity, emojiSubstitution.theme)
+      );
+      setEmojiFrames(newEmojiFrames);
+    } else {
+      setEmojiFrames([]);
+    }
+  }, [frames, emojiSubstitution.isSubstituted, emojiSubstitution.complexity, emojiSubstitution.theme]);
+
   const activeText = useMemo(() => {
     if (animState.mode === "frameCycle" && frames.length > 0) {
       const sec = timeRef.current / 1000;
       const idx = Math.floor(sec * Math.max(0.5, frameRate)) % frames.length;
-      return frames[idx];
+      // Use emoji-substituted frame if enabled, otherwise use original frame
+      return emojiSubstitution.isSubstituted && emojiFrames.length > idx
+        ? emojiFrames[idx]
+        : frames[idx];
     }
-    return text;
-  }, [animState.mode, frames, frameRate, text, tick]);
+    return emojiSubstitution.isSubstituted
+      ? emojiSubstitution.substitutedText
+      : text;
+  }, [animState.mode, frames, frameRate, text, tick, emojiSubstitution, emojiFrames]);
+
+  // Helper function to apply emoji substitution directly (for use in frame cycle)
+  const applyEmojiSubstitutionToText = useCallback((text: string, complexity: number, theme: string): string => {
+    if (!emojiSubstitution.isSubstituted) return text;
+
+    // Import the emoji substitution logic directly
+    const EMOJI_THEMES = {
+      lunar: {
+        'o': ['🌕', '🌝', '🌙', '◯', '●'],
+        'O': ['🌕', '🌝', '🌞', '◉', '⭕'],
+        '0': ['🌑', '🌚', '🌘', '🌗', '🌖'],
+        '(': ['🌙', '☽', '◔', '◕'],
+        ')': ['☾', '🌛', '◕', '◔'],
+        '{': ['🌜', '☽', '◧', '◨'],
+        '}': ['🌛', '☾', '◨', '◧'],
+        '[': ['🌙', '☽', '◀', '◁'],
+        ']': ['☾', '🌛', '▶', '▷'],
+        '|': ['🌙', '☾', '│', '┃'],
+        '/': ['🌙', '☾', '╱', '╲'],
+        '\\': ['🌙', '☾', '╲', '╱'],
+        '~': ['🌊', '🌙', '∼', '≈'],
+        '-': ['🌙', '☾', '─', '━']
+      },
+      nature: {
+        'o': ['🌱', '🌿', '🍃', '🌺', '🌻'],
+        'O': ['🌳', '🌲', '🌴', '🌵', '🪴'],
+        '0': ['🌱', '🌿', '🍃', '🍄', '☘️'],
+        '(': ['🌸', '🌷', '🌼', '💐', '💮'],
+        ')': ['🌸', '🌷', '🌼', '💐', '💮'],
+        '{': ['🎋', '🎍', '🍃', '🌿'],
+        '}': ['🎋', '🎍', '🍃', '🌿'],
+        '[': ['🪨', '🍃', '🌿', '🌱'],
+        ']': ['🪨', '🍃', '🌿', '🌱'],
+        '|': ['🪵', '🌿', '│', '┃'],
+        '/': ['🍃', '🌿', '╱', '╲'],
+        '\\': ['🍃', '🌿', '╲', '╱'],
+        '~': ['🌊', '💧', '💦', '粼'],
+        '-': ['🌿', '🍃', '🪨', '━']
+      },
+      abstract: {
+        'o': ['🔴', '🔵', '🟢', '🟡', '🟣'],
+        'O': ['🔘', '⭕', '⚪', '🔴', '🔵'],
+        '0': ['🔴', '🔵', '🟢', '🟡', '🟣'],
+        '(': ['🔺', '🔹', '🔸', '🔶', '🔷'],
+        ')': ['🔺', '🔹', '🔸', '🔶', '🔷'],
+        '{': ['◀️', '▶️', '🔼', '🔽'],
+        '}': ['◀️', '▶️', '🔼', '🔽'],
+        '[': ['🟥', '🟦', '🟩', '🟨'],
+        ']': ['🟥', '🟦', '🟩', '🟨'],
+        '|': ['⏸️', '🮂', '🮃', '│'],
+        '/': [' slash ', ' slash2 ', ' / ', ' ╱ '],
+        '\\': [' backslash ', ' \\ ', ' ╲ '],
+        '~': ['〰️', '〰', ' ~ ', ' ≈ '],
+        '-': ['➖', '—', '–', '─']
+      },
+      random: {
+        'o': ['🌕', '🌝', '🌙', '🌱', '🌸', '🔴', '🔵', '🟢', '🟡', '🟣'],
+        'O': ['🌕', '🌝', '🌞', '🌳', '🌲', '🔘', '⭕', '⚪', '🔴', '🔵'],
+        '0': ['🌑', '🌚', '🌘', '🌱', '🌿', '🔴', '🔵', '🟢', '🟡', '🟣'],
+        '(': ['🌙', '☽', '🌱', '🌸', '🌷', '🔺', '🔹', '🔸', '🔶', '🔷'],
+        ')': ['☾', '🌛', '🌿', '🍃', '🌺', '🔺', '🔹', '🔸', '🔶', '🔷'],
+        '{': ['🌜', '☽', '🎋', '🌿', '◀️', '▶️', '🔼', '🔽'],
+        '}': ['🌛', '☾', '🎍', '🍃', '◀️', '▶️', '🔼', '🔽'],
+        '[': ['🌙', '☽', '🪨', '🌱', '🟥', '🟦', '🟩', '🟨'],
+        ']': ['☾', '🌛', '🪨', '🌿', '🟥', '🟦', '🟩', '🟨'],
+        '|': ['🌙', '☾', '🪵', '🌿', '⏸️', '🮂', '🮃', '│'],
+        '/': ['🌙', '☾', '🍃', '🌿', ' slash ', ' slash2 ', ' / ', ' ╱ '],
+        '\\': ['🌙', '☾', '🍃', '🌿', ' backslash ', ' \\ ', ' ╲ '],
+        '~': ['🌊', '💧', '🌙', '🌱', '〰️', '〰', ' ~ ', ' ≈ '],
+        '-': ['🌙', '☾', '🌿', '🍃', '➖', '—', '–', '─']
+      }
+    };
+
+    const emojiMap = EMOJI_THEMES[theme as keyof typeof EMOJI_THEMES] || EMOJI_THEMES.lunar;
+    const lines = text.split('\n');
+
+    // Calculate substitution rate based on complexity (30% to 80%)
+    const substitutionRate = Math.min(0.3 + (complexity * 0.07), 0.8);
+
+    // Seeded random number generator
+    const seededRandom = (str: string): number => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0; // Convert to 32bit integer
+      }
+      return Math.abs(hash) / 2147483648; // Normalize to [0,1]
+    };
+
+    const resultLines = lines.map(line => {
+      const chars = line.split('');
+      const positions: { index: number; char: string }[] = [];
+
+      // Find all characters that can be substituted
+      chars.forEach((char, index) => {
+        if (emojiMap[char as keyof typeof emojiMap]) {
+          positions.push({ index, char });
+        }
+      });
+
+      // Randomly select positions to substitute based on substitution rate
+      const shuffledPositions = [...positions].sort((a, b) => seededRandom(`${text}-${a.index}`) - seededRandom(`${text}-${b.index}`));
+      const charsToReplace = Math.ceil(positions.length * substitutionRate);
+
+      // Apply substitutions
+      shuffledPositions.slice(0, charsToReplace).forEach(({ index, char }) => {
+        const emojiOptions = emojiMap[char as keyof typeof emojiMap];
+        const randomIndex = Math.floor(seededRandom(`${text}-${index}-${complexity}-${theme}`) * emojiOptions.length);
+        chars[index] = emojiOptions[randomIndex];
+      });
+
+      return chars.join('');
+    });
+
+    return resultLines.join('\n');
+  }, [emojiSubstitution.isSubstituted]);
+
 
   const lines = useMemo(() => activeText.split("\n"), [activeText]);
 
@@ -158,7 +297,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
               }
             }
             return (
-              <span key={j} style={cs}>
+              <span key={j} style={cs} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
                 {ch}
               </span>
             );
@@ -168,7 +307,11 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     }
     return (
       <div key={i} style={style} className="leading-[1.15]">
-        {line}
+        {line.split('').map((ch, j) => (
+          <span key={j} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
+            {ch}
+          </span>
+        ))}
       </div>
     );
   };
@@ -210,7 +353,8 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
   useEffect(() => {
     const linesCount = lines.length;
     const maxLen = Math.max(1, ...lines.map((l) => l.length));
-    const charW = 12;
+    // Use a slightly wider character width to account for emoji characters
+    const charW = 14;
     const charH = 20;
     const pad = 20;
     const w = Math.max(400, maxLen * charW + pad * 2);
@@ -242,7 +386,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     ctx.strokeRect(1, 1, c.width - 2, c.height - 2);
     const pad = 20;
     const charH = 20;
-    ctx.font = "20px JetBrains Mono, Courier New, monospace";
+    ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'Segoe UI Symbol', 'Symbola', 'Noto Sans', 'Courier New', monospace";
     const t = timeRef.current * 0.002 * animState.speed;
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
@@ -289,7 +433,9 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
             else if (animState.palette === "blue") color = "#1e3a8a";
           }
           ctx.fillStyle = color as any;
-          ctx.fillText(ch, pad + xOffset + j * 12, y);
+          // Use a different width calculation for emojis vs regular characters
+          const charWidth = ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? 16 : 12; // Emojis may need more space
+          ctx.fillText(ch, pad + xOffset + j * charWidth, y);
         }
       } else {
         if (
@@ -523,6 +669,46 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
             view upload
           </a>
         )}
+        <button
+          onClick={emojiSubstitution.toggleSubstitution}
+          className={`font-mono text-xs px-2 py-1 border rounded ${
+            emojiSubstitution.isSubstituted
+              ? "bg-green-600 text-white"
+              : "bg-gray-200 text-gray-800"
+          }`}
+        >
+          {emojiSubstitution.isSubstituted ? "emojis on" : "emojis off"}
+        </button>
+        {emojiSubstitution.isSubstituted && (
+          <>
+            <select
+              value={typeof emojiSubstitution.theme !== 'string' ? 'lunar' : emojiSubstitution.theme}
+              onChange={(e) => emojiSubstitution.setTheme(e.target.value as any)}
+              className="font-mono text-xs px-2 py-1 border rounded"
+            >
+              <option value="lunar">lunar</option>
+              <option value="nature">nature</option>
+              <option value="abstract">abstract</option>
+              <option value="random">random</option>
+            </select>
+            <label className="font-mono text-xs">comp</label>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={typeof emojiSubstitution.complexity !== 'number' ? 5 : emojiSubstitution.complexity}
+              onChange={(e) => emojiSubstitution.setComplexity(parseInt(e.target.value))}
+              className="w-20"
+            />
+            <button
+              onClick={emojiSubstitution.resetToOriginal}
+              className="font-mono text-xs px-2 py-1 border rounded bg-red-500 text-white"
+            >
+              reset
+            </button>
+          </>
+        )}
       </div>
       <div
         ref={containerRef}
@@ -541,7 +727,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
         {animState.mode === "svgWave" ? (
           renderSVG()
         ) : (
-          <div className="font-mono whitespace-pre text-[20px]">
+          <div className="font-mono whitespace-pre text-[20px] font-[monospace]">
             {lines.map(renderLineHTML)}
           </div>
         )}

@@ -32,80 +32,88 @@ export interface GeneratedEmoji {
 }
 
 /**
- * Lunar-exclusive emoji mappings
- * Each character maps to 2-3 authentic moon emojis
+ * Lunar-exclusive emoji mappings with rich variety
+ * Each character maps to many authentic moon emojis for visual diversity
  */
 const EMOJI_THEMES: Record<EmojiTheme, Record<string, string[]>> = {
   lunar: {
-    // Full moon and crescent variations
-    'o': ['🌕', '🌝', '🌙'],
-    'O': ['🌕', '🌝', '🌙'],
-    '0': ['🌕', '🌝', '🌙'],
-    // Curved brackets map to crescent moons
-    '(': ['🌙', '☽', '🌛'],
-    ')': ['🌙', '☾', '🌜'],
-    '{': ['🌙', '☽', '🌛'],
-    '}': ['🌙', '☾', '🌜'],
-    '[': ['🌙', '☽', '🌛'],
-    ']': ['🌙', '☾', '🌜'],
-    // Vertical and diagonal lines
-    '|': ['🌕', '🌙', '☽'],
-    '/': ['🌙', '☽', '🌛'],
-    '\\': ['🌙', '☾', '🌜'],
-    '~': ['🌙', '🌕', '☽'],
-    '-': ['🌙', '🌕', '☽'],
+    // Circular shapes - all moon phases and circles
+    'o': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌝', '🌚', '🌙', '🌛', '🌜', '☽', '☾'],
+    'O': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌝', '🌚', '🌙', '🌛', '🌜'],
+    '0': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌚', '🌙'],
+    // Curved brackets - crescents
+    '(': ['🌙', '☽', '🌛', '🌒', '🌓'],
+    ')': ['🌙', '☾', '🌜', '🌔', '🌕'],
+    '{': ['🌙', '☽', '🌛', '🌒', '🌓', '🌘'],
+    '}': ['🌙', '☾', '🌜', '🌔', '🌕', '🌖'],
+    '[': ['🌙', '☽', '🌛', '🌒', '🌓'],
+    ']': ['🌙', '☾', '🌜', '🌔', '🌕'],
+    // Vertical and diagonal - mixed phases and crescents
+    '|': ['🌕', '🌙', '☽', '☾', '🌚', '🌑', '🌛', '🌜'],
+    '/': ['🌙', '☽', '🌛', '🌒', '🌙', '🌚', '🌑'],
+    '\\': ['🌙', '☾', '🌜', '🌔', '🌙', '🌙', '🌕'],
+    '~': ['🌙', '🌕', '☽', '☾', '🌊', '🌙'],
+    '-': ['🌙', '🌕', '☽', '☾', '━', '🌑'],
+    '=': ['🌕', '🌙', '☽', '☾', '═'],
+    '_': ['🌙', '☽', '☾', '🌙', '_']
   },
   phases: {
-    // All phase progressions
-    'o': ['🌕', '🌖', '🌗'],
-    'O': ['🌕', '🌖', '🌗'],
-    '0': ['🌕', '🌖', '🌗'],
-    '(': ['🌙', '🌛', '☽'],
-    ')': ['🌙', '🌜', '☾'],
-    '{': ['🌙', '🌛', '☽'],
-    '}': ['🌙', '🌜', '☾'],
-    '[': ['🌙', '🌛', '☽'],
-    ']': ['🌙', '🌜', '☾'],
-    '|': ['🌕', '🌖', '🌗'],
-    '/': ['🌙', '🌛', '☽'],
-    '\\': ['🌙', '🌜', '☾'],
-    '~': ['🌕', '🌖', '🌗'],
-    '-': ['🌕', '🌖', '🌗'],
+    // All phase progressions for maximum cycle representation
+    'o': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔'],
+    'O': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌝'],
+    '0': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔'],
+    '(': ['🌙', '🌛', '☽', '🌒', '🌓', '🌘', '🌑'],
+    ')': ['🌙', '🌜', '☾', '🌔', '🌕', '🌖', '🌗'],
+    '{': ['🌙', '🌛', '☽', '🌒', '🌓', '🌘'],
+    '}': ['🌙', '🌜', '☾', '🌔', '🌕', '🌖'],
+    '[': ['🌙', '🌛', '☽', '🌒', '🌓', '🌘'],
+    ']': ['🌙', '🌜', '☾', '🌔', '🌕', '🌖'],
+    '|': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔'],
+    '/': ['🌙', '🌛', '☽', '🌒', '🌑', '🌘'],
+    '\\': ['🌙', '🌜', '☾', '🌔', '🌕', '🌖'],
+    '~': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒'],
+    '-': ['🌕', '🌖', '🌗', '🌘', '🌑', '🌒'],
+    '=': ['🌕', '🌖', '🌗', '🌑'],
+    '_': ['🌙', '🌘', '🌑', '🌒']
   },
   crescent: {
-    // Crescent and new moon focus
-    'o': ['🌙', '☽', '☾'],
-    'O': ['🌙', '☽', '☾'],
-    '0': ['🌙', '☽', '☾'],
-    '(': ['🌙', '☽', '🌛'],
-    ')': ['🌙', '☾', '🌜'],
-    '{': ['☽', '🌙', '🌛'],
-    '}': ['☾', '🌙', '🌜'],
-    '[': ['☽', '🌙', '🌛'],
-    ']': ['☾', '🌙', '🌜'],
-    '|': ['🌙', '☽', '☾'],
-    '/': ['☽', '🌙', '🌛'],
-    '\\': ['☾', '🌙', '🌜'],
-    '~': ['🌙', '☽', '☾'],
-    '-': ['🌙', '☽', '☾'],
+    // Crescent-focused with supporting phases
+    'o': ['🌙', '☽', '☾', '🌛', '🌜', '🌒', '🌔'],
+    'O': ['🌙', '☽', '☾', '🌛', '🌜', '🌒', '🌔', '🌕'],
+    '0': ['🌙', '☽', '☾', '🌛', '🌜', '🌑'],
+    '(': ['🌙', '☽', '🌛', '🌒', '🌓'],
+    ')': ['🌙', '☾', '🌜', '🌔', '🌕'],
+    '{': ['☽', '🌙', '🌛', '🌒'],
+    '}': ['☾', '🌙', '🌜', '🌔'],
+    '[': ['☽', '🌙', '🌛', '🌒'],
+    ']': ['☾', '🌙', '🌜', '🌔'],
+    '|': ['🌙', '☽', '☾', '🌛', '🌜'],
+    '/': ['☽', '🌙', '🌛', '🌒'],
+    '\\': ['☾', '🌙', '🌜', '🌔'],
+    '~': ['🌙', '☽', '☾', '🌛', '🌜'],
+    '-': ['🌙', '☽', '☾', '🌛', '🌜'],
+    '=': ['🌙', '☽', '☾'],
+    '_': ['🌙', '☽', '☾']
   },
   full: {
-    // Full moon and waxing gibbous
-    'o': ['🌕', '🌝', '🌖'],
-    'O': ['🌕', '🌝', '🌖'],
-    '0': ['🌕', '🌝', '🌖'],
-    '(': ['🌕', '🌝', '🌖'],
-    ')': ['🌕', '🌝', '🌖'],
-    '{': ['🌕', '🌝', '🌖'],
-    '}': ['🌕', '🌝', '🌖'],
-    '[': ['🌕', '🌝', '🌖'],
-    ']': ['🌕', '🌝', '🌖'],
-    '|': ['🌕', '🌝', '🌖'],
+    // Full moon dominance with waxing phases
+    'o': ['🌕', '🌝', '🌖', '🌗', '🌔', '🌓'],
+    'O': ['🌕', '🌝', '🌖', '🌗', '🌔', '🌓'],
+    '0': ['🌕', '🌝', '🌖', '🌗'],
+    '(': ['🌕', '🌝', '🌖', '🌔'],
+    ')': ['🌕', '🌝', '🌖', '🌔'],
+    '{': ['🌕', '🌝', '🌖', '🌔'],
+    '}': ['🌕', '🌝', '🌖', '🌔'],
+    '[': ['🌕', '🌝', '🌖', '🌔'],
+    ']': ['🌕', '🌝', '🌖', '🌔'],
+    '|': ['🌕', '🌝', '🌖', '🌗'],
     '/': ['🌕', '🌝', '🌖'],
     '\\': ['🌕', '🌝', '🌖'],
     '~': ['🌕', '🌝', '🌖'],
     '-': ['🌕', '🌝', '🌖'],
-  },
+    '=': ['🌕', '🌝'],
+    '_': ['🌕', '🌝']
+  }
 };
 
 /**
@@ -126,6 +134,25 @@ const PROTECTED_CHARS = new Set(['|', '/', '\\', '_', '-', '=']);
  * Character that frequently appear in boundaries and should be protected
  */
 const STRUCTURAL_CHARS = new Set(['(', ')', '{', '}', '[', ']']);
+
+/**
+ * Get a thematic blend of emoji pools from multiple themes
+ * Creates richer variety by mixing theme options
+ */
+function blendThemes(char: string, primaryTheme: EmojiTheme, seed: number): string[] {
+  const themes = getAvailableThemes();
+  const primaryPool = EMOJI_THEMES[primaryTheme][char as keyof typeof EMOJI_THEMES[typeof primaryTheme]] || [];
+  
+  // For dramatic variation, blend in options from other themes
+  if (seed % 3 === 0 && themes.length > 1) {
+    const otherTheme = themes[(seed % themes.length)] as EmojiTheme;
+    const otherPool = EMOJI_THEMES[otherTheme][char as keyof typeof EMOJI_THEMES[typeof otherTheme]] || [];
+    // Merge and deduplicate
+    return Array.from(new Set([...primaryPool, ...otherPool]));
+  }
+  
+  return primaryPool;
+}
 
 /**
  * Validates theme parameter
@@ -226,7 +253,7 @@ export function substituteEmojis(
 
     chars.forEach((char, charIndex) => {
       // Only consider characters in our emoji map
-      const emojiOptions = emojiMap[char as keyof typeof emojiMap];
+      let emojiOptions = emojiMap[char as keyof typeof emojiMap];
       if (!emojiOptions) return;
 
       totalEligibleChars++;
@@ -250,14 +277,23 @@ export function substituteEmojis(
         
         if (variation === 'subtle' || strategyValue < 1) {
           // Strategy 1: Simple emoji substitution
+          emojiOptions = blendThemes(char, params.theme, posHash);
           const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
           chars[charIndex] = emojiOptions[variantIndex];
           usedStrategies.add('substitution');
-        } else if (variation === 'dramatic' && strategyValue < 2.5 && STRUCTURAL_CHARS.has(char)) {
-          // Strategy 2: Thematic pairing (for brackets in dramatic mode)
-          const variantIndex = Math.floor((posHash / 50) % emojiOptions.length);
+        } else if (variation === 'dramatic' && strategyValue < 2) {
+          // Strategy 2: Theme blending (richer variety)
+          emojiOptions = blendThemes(char, params.theme, posHash);
+          const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
           chars[charIndex] = emojiOptions[variantIndex];
-          usedStrategies.add('thematic-pairing');
+          usedStrategies.add('theme-blending');
+        } else if (variation === 'dramatic' && strategyValue >= 2 && STRUCTURAL_CHARS.has(char)) {
+          // Strategy 3: Density variation - double up for visual impact in dramatic mode
+          emojiOptions = blendThemes(char, params.theme, posHash);
+          const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);
+          chars[charIndex] = emojiOptions[variantIndex] + emojiOptions[(variantIndex + 1) % emojiOptions.length];
+          usedStrategies.add('density-variation');
+          totalSubstitutedChars++; // Count as 2 for metrics
         } else {
           // Default back to substitution
           const variantIndex = Math.floor((posHash / 100) % emojiOptions.length);

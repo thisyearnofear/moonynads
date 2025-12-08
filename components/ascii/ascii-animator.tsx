@@ -85,33 +85,14 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     };
   }, [paused]);
 
-  const [emojiFrames, setEmojiFrames] = useState<string[]>([]);
-
-  // Update emoji frames when frames or emoji settings change
-  useEffect(() => {
-    if (emojiSubstitution.isSubstituted && frames.length > 0) {
-      const newEmojiFrames = frames.map(frame =>
-        applyEmojiSubstitutionToText(frame, emojiSubstitution.complexity, emojiSubstitution.theme)
-      );
-      setEmojiFrames(newEmojiFrames);
-    } else {
-      setEmojiFrames([]);
-    }
-  }, [frames, emojiSubstitution.isSubstituted, emojiSubstitution.complexity, emojiSubstitution.theme]);
-
   const activeText = useMemo(() => {
     if (animState.mode === "frameCycle" && frames.length > 0) {
       const sec = timeRef.current / 1000;
       const idx = Math.floor(sec * Math.max(0.5, frameRate)) % frames.length;
-      // Use emoji-substituted frame if enabled, otherwise use original frame
-      return emojiSubstitution.isSubstituted && emojiFrames.length > idx
-        ? emojiFrames[idx]
-        : frames[idx];
+      return frames[idx];
     }
-    return emojiSubstitution.isSubstituted
-      ? emojiSubstitution.substitutedText
-      : text;
-  }, [animState.mode, frames, frameRate, text, tick, emojiSubstitution, emojiFrames]);
+    return text;
+  }, [animState.mode, frames, frameRate, text, tick]);
 
   // Helper function to apply emoji substitution directly (for use in frame cycle)
   const applyEmojiSubstitutionToText = useCallback((text: string, complexity: number, theme: string): string => {
@@ -669,46 +650,6 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
             view upload
           </a>
         )}
-        <button
-          onClick={emojiSubstitution.toggleSubstitution}
-          className={`font-mono text-xs px-2 py-1 border rounded ${
-            emojiSubstitution.isSubstituted
-              ? "bg-green-600 text-white"
-              : "bg-gray-200 text-gray-800"
-          }`}
-        >
-          {emojiSubstitution.isSubstituted ? "emojis on" : "emojis off"}
-        </button>
-        {emojiSubstitution.isSubstituted && (
-          <>
-            <select
-              value={typeof emojiSubstitution.theme !== 'string' ? 'lunar' : emojiSubstitution.theme}
-              onChange={(e) => emojiSubstitution.setTheme(e.target.value as any)}
-              className="font-mono text-xs px-2 py-1 border rounded"
-            >
-              <option value="lunar">lunar</option>
-              <option value="nature">nature</option>
-              <option value="abstract">abstract</option>
-              <option value="random">random</option>
-            </select>
-            <label className="font-mono text-xs">comp</label>
-            <input
-              type="range"
-              min={1}
-              max={10}
-              step={1}
-              value={typeof emojiSubstitution.complexity !== 'number' ? 5 : emojiSubstitution.complexity}
-              onChange={(e) => emojiSubstitution.setComplexity(parseInt(e.target.value))}
-              className="w-20"
-            />
-            <button
-              onClick={emojiSubstitution.resetToOriginal}
-              className="font-mono text-xs px-2 py-1 border rounded bg-red-500 text-white"
-            >
-              reset
-            </button>
-          </>
-        )}
       </div>
       <div
         ref={containerRef}
@@ -739,6 +680,59 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
           height={canvasSize.h}
           className="w-full max-w-xl rounded border border-yellow-600/30"
         />
+      </div>
+
+      {/* Emoji Substitution Section */}
+      <div className="mt-6 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+        <h3 className="font-mono text-lg font-semibold mb-3">🍑 Emoji Generator</h3>
+        <div className="flex flex-wrap gap-2 items-center">
+          <button
+            onClick={emojiSubstitution.toggleSubstitution}
+            className={`font-mono text-sm px-3 py-1.5 border rounded ${
+              emojiSubstitution.isSubstituted
+                ? "bg-green-600 text-white"
+                : "bg-gray-200 text-gray-800"
+            }`}
+          >
+            {emojiSubstitution.isSubstituted ? "Emojis Active" : "Enable Emojis"}
+          </button>
+          {emojiSubstitution.isSubstituted && (
+            <>
+              <select
+                value={typeof emojiSubstitution.theme !== 'string' ? 'lunar' : emojiSubstitution.theme}
+                onChange={(e) => emojiSubstitution.setTheme(e.target.value as any)}
+                className="font-mono text-sm px-2 py-1 border rounded"
+              >
+                <option value="lunar">Lunar Theme</option>
+                <option value="nature">Nature Theme</option>
+                <option value="abstract">Abstract Theme</option>
+                <option value="random">Random Theme</option>
+              </select>
+              <label className="font-mono text-sm">Complexity:</label>
+              <input
+                type="range"
+                min={1}
+                max={10}
+                step={1}
+                value={typeof emojiSubstitution.complexity !== 'number' ? 5 : emojiSubstitution.complexity}
+                onChange={(e) => emojiSubstitution.setComplexity(parseInt(e.target.value))}
+                className="w-24"
+              />
+              <span className="font-mono text-sm">{typeof emojiSubstitution.complexity !== 'number' ? 5 : emojiSubstitution.complexity}</span>
+              <button
+                onClick={emojiSubstitution.resetToOriginal}
+                className="font-mono text-sm px-3 py-1.5 border rounded bg-red-500 text-white"
+              >
+                Reset
+              </button>
+            </>
+          )}
+        </div>
+        {emojiSubstitution.isSubstituted && (
+          <div className="mt-3 p-3 bg-white dark:bg-gray-900 rounded border font-mono text-sm overflow-x-auto whitespace-pre">
+            {emojiSubstitution.substitutedText}
+          </div>
+        )}
       </div>
     </div>
   );

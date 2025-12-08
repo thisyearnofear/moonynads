@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 interface EmojiSubstitutionParams {
   text: string;
@@ -107,11 +107,9 @@ export const useEmojiSubstitution = (initialText: string): EmojiSubstitutionResu
   const [originalText, setOriginalText] = useState(initialText);
 
   const applyEmojiSubstitution = useCallback((text: string, complexityValue: number, themeKey: string): string => {
-    if (!enabled) return text;
-
     const emojiMap = EMOJI_THEMES[themeKey as keyof typeof EMOJI_THEMES] || EMOJI_THEMES.lunar;
     const lines = text.split('\n');
-    
+
     // Calculate substitution rate based on complexity (30% to 80%)
     const substitutionRate = Math.min(0.3 + (complexityValue * 0.07), 0.8);
 
@@ -141,7 +139,7 @@ export const useEmojiSubstitution = (initialText: string): EmojiSubstitutionResu
     });
 
     return resultLines.join('\n');
-  }, [enabled]);
+  }, []);
 
   const toggleSubstitution = useCallback(() => {
     setEnabled(prev => {
@@ -170,19 +168,29 @@ export const useEmojiSubstitution = (initialText: string): EmojiSubstitutionResu
 
   const setComplexityCallback = useCallback((newComplexity: number) => {
     setComplexity(newComplexity);
-  }, []);
+    // Only update substitution if currently enabled
+    if (enabled) {
+      const newText = applyEmojiSubstitution(originalText, newComplexity, theme);
+      setSubstitutedText(newText);
+    }
+  }, [enabled, applyEmojiSubstitution, originalText, theme]);
 
   const setThemeCallback = useCallback((newTheme: 'lunar' | 'nature' | 'abstract' | 'random') => {
     setTheme(newTheme);
-  }, []);
-
-  // Update when complexity or theme changes (but only if enabled)
-  if (enabled) {
-    const updatedText = applyEmojiSubstitution(originalText, complexity, theme);
-    if (updatedText !== substitutedText) {
-      setSubstitutedText(updatedText);
+    // Only update substitution if currently enabled
+    if (enabled) {
+      const newText = applyEmojiSubstitution(originalText, complexity, newTheme);
+      setSubstitutedText(newText);
     }
-  }
+  }, [enabled, applyEmojiSubstitution, originalText, complexity]);
+
+  // When original text changes, update if currently enabled
+  useEffect(() => {
+    if (enabled) {
+      const newText = applyEmojiSubstitution(originalText, complexity, theme);
+      setSubstitutedText(newText);
+    }
+  }, [originalText, enabled, applyEmojiSubstitution, complexity, theme]);
 
   return {
     substitutedText: enabled ? substitutedText : originalText,

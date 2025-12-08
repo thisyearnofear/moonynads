@@ -29,7 +29,6 @@ export interface EmojiSubstitutionResult {
 export const useEmojiSubstitution = (
   initialText: string
 ): EmojiSubstitutionResult => {
-  const [enabled, setEnabled] = useState(false);
   const [complexity, setComplexity] = useState(5);
   const [theme, setTheme] = useState<EmojiTheme>('lunar');
   const [substitutedText, setSubstitutedText] = useState(initialText);
@@ -39,35 +38,20 @@ export const useEmojiSubstitution = (
 
   // Apply emoji substitution whenever text, complexity, or theme changes
   useEffect(() => {
-    if (enabled) {
-      try {
-        const result = substituteEmojis({
-          text: initialText,
-          complexity,
-          theme,
-        });
-        setSubstitutedText(result.art);
-        setMetadata(result.metadata);
-      } catch (error) {
-        console.error('Emoji substitution error:', error);
-        setSubstitutedText(initialText);
-        setMetadata(null);
-      }
-    } else {
+    try {
+      const result = substituteEmojis({
+        text: initialText,
+        complexity,
+        theme,
+      });
+      setSubstitutedText(result.art);
+      setMetadata(result.metadata);
+    } catch (error) {
+      console.error('Emoji substitution error:', error);
       setSubstitutedText(initialText);
       setMetadata(null);
     }
-  }, [initialText, enabled, complexity, theme]);
-
-  const toggleSubstitution = useCallback(() => {
-    setEnabled((prev) => !prev);
-  }, []);
-
-  const resetToOriginal = useCallback(() => {
-    setEnabled(false);
-    setComplexity(5);
-    setTheme('lunar');
-  }, []);
+  }, [initialText, complexity, theme]);
 
   const setComplexityCallback = useCallback((newComplexity: number) => {
     const clamped = Math.max(1, Math.min(10, newComplexity));
@@ -80,14 +64,14 @@ export const useEmojiSubstitution = (
 
   return {
     substitutedText,
-    isSubstituted: enabled,
+    isSubstituted: true, // Always substituted since it's always displayed
     complexity,
     theme,
     metadata,
-    toggleSubstitution,
+    toggleSubstitution: () => {}, // No-op, kept for API compatibility
     setComplexity: setComplexityCallback,
     setTheme: setThemeCallback,
-    resetToOriginal,
+    resetToOriginal: () => {}, // No-op, kept for API compatibility
     getThemeDescription,
     getAvailableThemes,
   };

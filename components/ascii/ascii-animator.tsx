@@ -85,6 +85,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     };
   }, [paused]);
 
+  // Animation always uses original ASCII, unaffected by emoji substitution
   const activeText = useMemo(() => {
     let baseText = text;
     if (animState.mode === "frameCycle" && frames.length > 0) {
@@ -92,8 +93,8 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
       const idx = Math.floor(sec * Math.max(0.5, frameRate)) % frames.length;
       baseText = frames[idx];
     }
-    return emojiSubstitution.isSubstituted ? emojiSubstitution.substitutedText : baseText;
-  }, [animState.mode, frames, frameRate, text, tick, emojiSubstitution.isSubstituted, emojiSubstitution.substitutedText]);
+    return baseText;
+  }, [animState.mode, frames, frameRate, text, tick]);
 
 
   const lines = useMemo(() => activeText.split("\n"), [activeText]);
@@ -576,109 +577,87 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
         />
       </div>
 
-      {/* Emoji Substitution Section */}
+      {/* Lunar Emoji Generator - Static Preview Only */}
       <div className="mt-6 pixel-border rounded-lg bg-card">
         <div className="px-4 py-3 border-b border-border">
           <h3 className="font-mono text-sm font-bold text-yellow-700 dark:text-yellow-500">
-            🌙 LUNAR EMOJI GENERATOR
+            🌙 LUNAR EMOJI PREVIEW
           </h3>
           <p className="font-mono text-xs text-foreground/70 mt-1">
-            Transform ASCII art into authentic moon-themed emoji variations
+            Static preview of moon-themed emoji variations (non-animated)
           </p>
         </div>
-        <div className="p-4">
-          <div className="flex flex-wrap gap-2 items-center mb-4">
-            <button
-              onClick={emojiSubstitution.toggleSubstitution}
-              className={`font-mono text-xs px-3 py-1.5 border rounded ${
-                emojiSubstitution.isSubstituted
-                  ? "bg-green-600 text-white"
-                  : "border-border"
-              }`}
+        <div className="p-4 space-y-4">
+          <div className="flex flex-wrap gap-2 items-center">
+            <select
+              value={emojiSubstitution.theme}
+              onChange={(e) => emojiSubstitution.setTheme(e.target.value as any)}
+              className="font-mono text-xs px-2 py-1 border rounded"
+              title={emojiSubstitution.getThemeDescription(emojiSubstitution.theme)}
             >
-              {emojiSubstitution.isSubstituted ? "active" : "enable"}
+              {emojiSubstitution.getAvailableThemes().map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </select>
+            <label className="font-mono text-xs">complexity</label>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              step={1}
+              value={emojiSubstitution.complexity}
+              onChange={(e) => emojiSubstitution.setComplexity(parseInt(e.target.value))}
+              title={`Substitution rate: ${emojiSubstitution.metadata?.substitutionRate}%`}
+            />
+            <span className="font-mono text-xs">{emojiSubstitution.complexity}</span>
+            <button
+              onClick={() => {
+                const blob = new Blob([emojiSubstitution.substitutedText], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${pantId || "ascii"}-emoji.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="font-mono text-xs px-2 py-1 border rounded"
+            >
+              download
             </button>
-            {emojiSubstitution.isSubstituted && (
-              <>
-                <select
-                  value={emojiSubstitution.theme}
-                  onChange={(e) => emojiSubstitution.setTheme(e.target.value as any)}
-                  className="font-mono text-xs px-2 py-1 border rounded"
-                  title={emojiSubstitution.getThemeDescription(emojiSubstitution.theme)}
-                >
-                  {emojiSubstitution.getAvailableThemes().map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-                <label className="font-mono text-xs">complexity</label>
-                <input
-                  type="range"
-                  min={1}
-                  max={10}
-                  step={1}
-                  value={emojiSubstitution.complexity}
-                  onChange={(e) => emojiSubstitution.setComplexity(parseInt(e.target.value))}
-                  title={`Substitution rate: ${emojiSubstitution.metadata?.substitutionRate}%`}
-                />
-                <span className="font-mono text-xs">{emojiSubstitution.complexity}</span>
-                <button
-                  onClick={emojiSubstitution.resetToOriginal}
-                  className="font-mono text-xs px-2 py-1 border rounded"
-                >
-                  reset
-                </button>
-                <button
-                  onClick={() => {
-                    const blob = new Blob([emojiSubstitution.substitutedText], { type: "text/plain" });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `${pantId || "ascii"}-emoji.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                  }}
-                  className="font-mono text-xs px-2 py-1 border rounded"
-                >
-                  download
-                </button>
-              </>
-            )}
           </div>
-          {emojiSubstitution.isSubstituted && (
-            <>
-              <div className="pixel-border p-3 rounded bg-background/70 font-mono text-xs overflow-x-auto whitespace-pre">
-                {emojiSubstitution.substitutedText}
-              </div>
-              {emojiSubstitution.metadata && (
-                <div className="mt-2 text-xs text-foreground/60 grid grid-cols-2 gap-2 md:grid-cols-4">
-                  <div>
-                    <span className="text-foreground/50">Substituted:</span>
-                    <div className="font-mono">
-                      {emojiSubstitution.metadata.charactersSubstituted}/
-                      {emojiSubstitution.metadata.totalCharactersEligible}
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-foreground/50">Rate:</span>
-                    <div className="font-mono">
-                      {Math.round(emojiSubstitution.metadata.substitutionRate * 100)}%
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-foreground/50">Theme:</span>
-                    <div className="font-mono">{emojiSubstitution.metadata.theme}</div>
-                  </div>
-                  <div>
-                    <span className="text-foreground/50">Integrity:</span>
-                    <div className="font-mono">
-                      {emojiSubstitution.metadata.themeIntegrity}%
-                    </div>
-                  </div>
+
+          <div className="pixel-border p-3 rounded bg-background/70 font-mono text-xs overflow-x-auto whitespace-pre">
+            {emojiSubstitution.substitutedText}
+          </div>
+
+          {emojiSubstitution.metadata && (
+            <div className="text-xs text-foreground/60 grid grid-cols-2 gap-2 md:grid-cols-4">
+              <div>
+                <span className="text-foreground/50">Substituted:</span>
+                <div className="font-mono">
+                  {emojiSubstitution.metadata.charactersSubstituted}/
+                  {emojiSubstitution.metadata.totalCharactersEligible}
                 </div>
-              )}
-            </>
+              </div>
+              <div>
+                <span className="text-foreground/50">Rate:</span>
+                <div className="font-mono">
+                  {Math.round(emojiSubstitution.metadata.substitutionRate * 100)}%
+                </div>
+              </div>
+              <div>
+                <span className="text-foreground/50">Theme:</span>
+                <div className="font-mono">{emojiSubstitution.metadata.theme}</div>
+              </div>
+              <div>
+                <span className="text-foreground/50">Integrity:</span>
+                <div className="font-mono">
+                  {emojiSubstitution.metadata.themeIntegrity}%
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>

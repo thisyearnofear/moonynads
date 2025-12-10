@@ -5,7 +5,7 @@ import { useAnimationState } from "@/hooks/ui/use-animation-state";
 import { useAnimationRecorder } from "@/hooks/ui/use-animation-recorder";
 import { useAnimationUpload } from "@/hooks/ui/use-animation-upload";
 import { useEmojiSubstitution } from "@/hooks/ascii/use-emoji-substitution";
-import { useColorRendering, ColorRenderMode, ColorVariation, getColorModeLabel } from "@/hooks/ascii/use-color-rendering";
+import { useColorRendering, ColorRenderMode, ColorVariation, FillStyle, BoundaryType, TextContrast, EdgeStyle, getColorModeLabel } from "@/hooks/ascii/use-color-rendering";
 
 interface ASCIIAnimatorProps {
   src: string;
@@ -26,6 +26,11 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
   const [colorMode, setColorMode] = useState<ColorRenderMode>('none');
   const [colorVariation, setColorVariation] = useState<ColorVariation>('deterministic');
   const [colorSeed, setColorSeed] = useState(`${pantId}-default`);
+  const [fillStyle, setFillStyle] = useState<FillStyle>('character');
+  const [boundaryType, setBoundaryType] = useState<BoundaryType>('full-width');
+  const [textContrast, setTextContrast] = useState<TextContrast>('auto');
+  const [patchOpacity, setPatchOpacity] = useState(100);
+  const [edgeStyle, setEdgeStyle] = useState<EdgeStyle>('hard');
   const timeRef = useRef(0);
   const rafRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -100,7 +105,17 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     return baseText;
   }, [animState.mode, frames, frameRate, text, tick]);
 
-  const colorRendering = useColorRendering(activeText, colorMode, colorVariation, colorVariation === 'seedable' ? colorSeed : '');
+  const colorRendering = useColorRendering(
+    activeText, 
+    colorMode, 
+    colorVariation, 
+    colorVariation === 'seedable' ? colorSeed : '',
+    fillStyle,
+    boundaryType,
+    textContrast,
+    patchOpacity,
+    edgeStyle
+  );
 
   const lines = useMemo(() => activeText.split("\n"), [activeText]);
 
@@ -139,15 +154,6 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     const style: React.CSSProperties = {
       transform: `translate(${x}px, ${y}px)`,
     };
-
-    // Apply color rendering background if enabled
-    if (colorMode !== 'none' && colorMode !== 'density-map') {
-      const bgColor = colorRendering.getLineBackgroundColor(i);
-      if (bgColor) {
-        style.backgroundColor = bgColor;
-      }
-    }
-
     if (
       (animState.mode === "colorCycle" || animState.palette === "rainbow") &&
       !animState.gradient
@@ -164,15 +170,6 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
               (animState.targetSet &&
                 new Set(animState.targetSet.split("")).has(ch));
             const cs: React.CSSProperties = {};
-            
-            // Apply color rendering if enabled
-            if (colorMode !== 'none') {
-              const charColor = colorRendering.getCharColor(i, j, ch);
-              if (charColor) {
-                cs.color = charColor;
-              }
-            }
-
             if (isTarget && !animState.gradient) {
               if (animState.palette === "rainbow") {
                 const hue = (t * 60 + i * 20) % 360;
@@ -196,23 +193,11 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     }
     return (
       <div key={i} style={style} className="leading-[1.15]">
-        {line.split('').map((ch, j) => {
-          const cs: React.CSSProperties = {};
-          
-          // Apply color rendering if enabled
-          if (colorMode !== 'none') {
-            const charColor = colorRendering.getCharColor(i, j, ch);
-            if (charColor) {
-              cs.color = charColor;
-            }
-          }
-
-          return (
-            <span key={j} style={cs} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
-              {ch}
-            </span>
-          );
-        })}
+        {line.split('').map((ch, j) => (
+          <span key={j} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
+            {ch}
+          </span>
+        ))}
       </div>
     );
   };
@@ -289,18 +274,6 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     const charH = 20;
     ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'Segoe UI Symbol', 'Symbola', 'Noto Sans', 'Courier New', monospace";
     const t = timeRef.current * 0.002 * animState.speed;
-    
-    // Draw color backgrounds if enabled
-    if (colorMode !== 'none' && colorMode !== 'density-map') {
-      for (let i = 0; i < lines.length; i++) {
-        const bgColor = colorRendering.getLineBackgroundColor(i);
-        if (bgColor) {
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(1, pad + charH * i, c.width - 2, charH);
-        }
-      }
-    }
-    
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const phaseScale = interactive ? 0.5 + pointerXRef.current : 1;
@@ -333,23 +306,14 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
           const isTarget =
             (animState.targetChar && ch === animState.targetChar) ||
             (animState.targetSet && setChars.has(ch));
-          
-          // Apply color rendering if enabled
-          if (colorMode !== 'none') {
-            const charColor = colorRendering.getCharColor(i, j, ch);
-            if (charColor) {
-              color = charColor;
-            }
-          }
-          
-          if (isTarget && colorMode === 'none') {
+          if (isTarget) {
             if (animState.palette === "rainbow") {
               const hue = (t * 60 + i * 20) % 360;
               color = `hsl(${hue}, 90%, 60%)`;
             } else if (animState.palette === "yellow") color = "#f59e0b";
             else if (animState.palette === "green") color = "#22c55e";
             else if (animState.palette === "blue") color = "#3b82f6";
-          } else if (!isTarget && colorMode === 'none') {
+          } else {
             if (animState.palette === "yellow") color = "#a16207";
             else if (animState.palette === "green") color = "#15803d";
             else if (animState.palette === "blue") color = "#1e3a8a";
@@ -360,32 +324,17 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
           ctx.fillText(ch, pad + xOffset + j * charWidth, y);
         }
       } else {
-        if (colorMode !== 'none') {
-          // Apply color rendering per character
-          for (let j = 0; j < line.length; j++) {
-            const ch = line[j];
-            const charColor = colorRendering.getCharColor(i, j, ch);
-            if (charColor) {
-              ctx.fillStyle = charColor;
-            } else {
-              ctx.fillStyle = "#f4f4f5";
-            }
-            const charWidth = ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? 16 : 12;
-            ctx.fillText(ch, pad + xOffset + j * charWidth, y);
-          }
-        } else {
-          if (
-            animState.mode === "colorCycle" ||
-            animState.palette === "rainbow"
-          ) {
-            const hue = (t * 60 + i * 20) % 360;
-            ctx.fillStyle = `hsl(${hue}, 80%, 60%)` as any;
-          } else if (animState.palette === "yellow") ctx.fillStyle = "#a16207";
-          else if (animState.palette === "green") ctx.fillStyle = "#15803d";
-          else if (animState.palette === "blue") ctx.fillStyle = "#1e3a8a";
-          else ctx.fillStyle = "#f4f4f5";
-          ctx.fillText(line, pad + xOffset, y);
-        }
+        if (
+          animState.mode === "colorCycle" ||
+          animState.palette === "rainbow"
+        ) {
+          const hue = (t * 60 + i * 20) % 360;
+          ctx.fillStyle = `hsl(${hue}, 80%, 60%)` as any;
+        } else if (animState.palette === "yellow") ctx.fillStyle = "#a16207";
+        else if (animState.palette === "green") ctx.fillStyle = "#15803d";
+        else if (animState.palette === "blue") ctx.fillStyle = "#1e3a8a";
+        else ctx.fillStyle = "#f4f4f5";
+        ctx.fillText(line, pad + xOffset, y);
       }
     }
   }, [
@@ -785,14 +734,14 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
         </div>
       </div>
 
-      {/* Color Rendering Engine */}
+      {/* Color Rendering Controls */}
       <div className="mt-6 pixel-border rounded-lg bg-card">
         <div className="px-4 py-3 border-b border-border text-center">
           <h3 className="font-mono text-sm font-bold text-yellow-700 dark:text-yellow-500">
             🎨 COLOR RENDERING ENGINE
           </h3>
           <p className="font-mono text-xs text-foreground/70 mt-1">
-            Monochrome & negative space interpretation of ASCII designs
+            Monochrome, noir, negative space & density maps
           </p>
         </div>
         <div className="p-4 space-y-3">
@@ -845,6 +794,77 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
                 </div>
               )}
 
+              <div className="border-t border-border/50 pt-2 space-y-2">
+                <div className="flex flex-wrap gap-2 items-center justify-center">
+                  <label className="font-mono text-xs">fill</label>
+                  <select
+                    value={fillStyle}
+                    onChange={(e) => setFillStyle(e.target.value as FillStyle)}
+                    className="font-mono text-xs px-2 py-1 border rounded"
+                  >
+                    <option value="character">character</option>
+                    <option value="patch">patch</option>
+                  </select>
+                </div>
+
+                {fillStyle === 'patch' && (
+                  <>
+                    <div className="flex flex-wrap gap-2 items-center justify-center">
+                      <label className="font-mono text-xs">boundary</label>
+                      <select
+                        value={boundaryType}
+                        onChange={(e) => setBoundaryType(e.target.value as BoundaryType)}
+                        className="font-mono text-xs px-2 py-1 border rounded"
+                      >
+                        <option value="full-width">full-width</option>
+                        <option value="tight">tight</option>
+                        <option value="padded">padded</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 items-center justify-center">
+                      <label className="font-mono text-xs">contrast</label>
+                      <select
+                        value={textContrast}
+                        onChange={(e) => setTextContrast(e.target.value as TextContrast)}
+                        className="font-mono text-xs px-2 py-1 border rounded"
+                      >
+                        <option value="auto">auto</option>
+                        <option value="white">white</option>
+                        <option value="black">black</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 items-center justify-center">
+                      <label className="font-mono text-xs">opacity</label>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        step={10}
+                        value={patchOpacity}
+                        onChange={(e) => setPatchOpacity(parseFloat(e.target.value))}
+                        className="w-24"
+                      />
+                      <span className="font-mono text-xs w-8">{patchOpacity}%</span>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 items-center justify-center">
+                      <label className="font-mono text-xs">edge</label>
+                      <select
+                        value={edgeStyle}
+                        onChange={(e) => setEdgeStyle(e.target.value as EdgeStyle)}
+                        className="font-mono text-xs px-2 py-1 border rounded"
+                      >
+                        <option value="hard">hard</option>
+                        <option value="soft">soft</option>
+                        <option value="rounded">rounded</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+              </div>
+
               <div className="pt-2 border-t border-border/50 text-xs text-foreground/60 space-y-1 font-mono">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
@@ -874,6 +894,57 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
           )}
         </div>
       </div>
+
+      {/* Color Rendering Preview */}
+      {colorMode !== 'none' && (
+        <div className="mt-6 pixel-border rounded-lg bg-card">
+          <div className="px-4 py-3 border-b border-border text-center">
+            <h3 className="font-mono text-sm font-bold text-yellow-700 dark:text-yellow-500">
+              🎬 COLOR PREVIEW
+            </h3>
+            <p className="font-mono text-xs text-foreground/70 mt-1">
+              Static rendering with {getColorModeLabel(colorMode)} mode ({fillStyle === 'patch' ? 'patch fill' : 'character color'})
+            </p>
+          </div>
+          <div className="p-4">
+            <div className="pixel-border p-3 rounded bg-background/70 font-mono text-xs overflow-x-auto whitespace-pre text-center w-full leading-[1.15]">
+              {colorRendering.lines.map((line, i) => {
+                const patchBg = colorRendering.getPatchBackground(i);
+                const lineStyle: React.CSSProperties = {};
+                if (fillStyle === 'patch' && patchBg) {
+                  lineStyle.backgroundColor = patchBg;
+                  if (edgeStyle === 'rounded') {
+                    lineStyle.borderRadius = '0.25rem';
+                  }
+                }
+                
+                return (
+                  <div key={i} style={lineStyle} className="leading-[1.15]">
+                    {line.split('').map((ch, j) => {
+                      const style: React.CSSProperties = {};
+                      
+                      if (fillStyle === 'patch') {
+                        // In patch mode, use high-contrast text
+                        style.color = colorRendering.getTextColorForPatch(i);
+                      } else {
+                        // In character mode, use subtle character colors
+                        const charColor = colorRendering.getCharColor(i, j, ch);
+                        if (charColor) style.color = charColor;
+                      }
+                      
+                      return (
+                        <span key={j} style={style} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
+                          {ch}
+                        </span>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

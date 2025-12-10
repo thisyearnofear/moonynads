@@ -2,6 +2,10 @@ import { useMemo } from 'react'
 
 export type ColorRenderMode = 'none' | 'monochrome' | 'negative-space' | 'density-map'
 export type ColorVariation = 'deterministic' | 'seedable'
+export type FillStyle = 'character' | 'patch'
+export type BoundaryType = 'full-width' | 'tight' | 'padded'
+export type TextContrast = 'auto' | 'white' | 'black'
+export type EdgeStyle = 'hard' | 'soft' | 'rounded'
 
 export interface ColorRegion {
   startRow: number
@@ -51,7 +55,12 @@ export function useColorRendering(
   text: string, 
   mode: ColorRenderMode = 'none',
   variation: ColorVariation = 'deterministic',
-  seed: string = ''
+  seed: string = '',
+  fillStyle: FillStyle = 'character',
+  boundaryType: BoundaryType = 'full-width',
+  textContrast: TextContrast = 'auto',
+  opacity: number = 100,
+  edgeStyle: EdgeStyle = 'hard'
 ) {
   const lines = useMemo(() => text.split('\n'), [text])
 
@@ -212,6 +221,79 @@ export function useColorRendering(
     densityMap: new Map(lineDensities.map((d, i) => [i, d])),
   }
 
+  // Helper to get text color based on background for patch mode
+  const getTextColorForPatch = (lineIndex: number): string => {
+    if (textContrast === 'white') return '#ffffff'
+    if (textContrast === 'black') return '#000000'
+    
+    // Auto-detect based on background luminance
+    const bgColor = getLineBackgroundColor(lineIndex)
+    if (!bgColor) return '#ffffff'
+    
+    // Parse RGB from color
+    const match = bgColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
+    if (match) {
+      const r = parseInt(match[1])
+      const g = parseInt(match[2])
+      const b = parseInt(match[3])
+      const luminance = (r * 299 + g * 587 + b * 114) / 1000
+      return luminance > 128 ? '#000000' : '#ffffff'
+    }
+    
+    // For hex colors
+    const hexMatch = bgColor.match(/#([0-9A-Fa-f]{6})/)
+    if (hexMatch) {
+      const hex = parseInt(hexMatch[1], 16)
+      const r = (hex >> 16) & 255
+      const g = (hex >> 8) & 255
+      const b = hex & 255
+      const luminance = (r * 299 + g * 587 + b * 114) / 1000
+      return luminance > 128 ? '#000000' : '#ffffff'
+    }
+    
+    return '#ffffff'
+  }
+
+  // Get patch background with opacity
+  const getPatchBackground = (lineIndex: number): string | null => {
+    if (fillStyle === 'character') return null
+    
+    const bgColor = getLineBackgroundColor(lineIndex)
+    if (!bgColor) return null
+    
+    if (opacity < 100) {
+      // Add opacity to the color
+      if (bgColor.startsWith('rgb')) {
+        const opacityVal = opacity / 100
+        return bgColor.replace(')', `, ${opacityVal})`).replace('rgb', 'rgba')
+      }
+      // For hex colors, convert to rgba
+      const hexMatch = bgColor.match(/#([0-9A-Fa-f]{6})/)
+      if (hexMatch) {
+        const hex = parseInt(hexMatch[1], 16)
+        const r = (hex >> 16) & 255
+        const g = (hex >> 8) & 255
+        const b = hex & 255
+        const opacityVal = opacity / 100
+        return `rgba(${r}, ${g}, ${b}, ${opacityVal})`
+      }
+    }
+    
+    return bgColor
+  }
+
+  // Get edge style CSS
+  const getEdgeStyle = (): string => {
+    switch (edgeStyle) {
+      case 'soft':
+        return 'blur(1px)'
+      case 'rounded':
+        return '0.25rem'
+      default:
+        return '0'
+    }
+  }
+
   return {
     mode,
     lines,
@@ -219,11 +301,19 @@ export function useColorRendering(
     regions: simplifyedRegions,
     getCharColor,
     getLineBackgroundColor,
+    getTextColorForPatch,
+    getPatchBackground,
+    getEdgeStyle,
     metadata,
     variation,
     seed,
     colorPalette,
     densityThreshold,
+    fillStyle,
+    boundaryType,
+    textContrast,
+    opacity,
+    edgeStyle,
   }
 }
 

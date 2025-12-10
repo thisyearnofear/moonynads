@@ -5,6 +5,7 @@ import { useAnimationState } from "@/hooks/ui/use-animation-state";
 import { useAnimationRecorder } from "@/hooks/ui/use-animation-recorder";
 import { useAnimationUpload } from "@/hooks/ui/use-animation-upload";
 import { useEmojiSubstitution } from "@/hooks/ascii/use-emoji-substitution";
+import { useColorRendering, ColorRenderMode, ColorVariation, getColorModeLabel } from "@/hooks/ascii/use-color-rendering";
 
 interface ASCIIAnimatorProps {
   src: string;
@@ -22,6 +23,9 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
   const [interactive, setInteractive] = useState(true);
   const [frames, setFrames] = useState<string[]>([]);
   const [frameRate, setFrameRate] = useState(4);
+  const [colorMode, setColorMode] = useState<ColorRenderMode>('none');
+  const [colorVariation, setColorVariation] = useState<ColorVariation>('deterministic');
+  const [colorSeed, setColorSeed] = useState(`${pantId}-default`);
   const timeRef = useRef(0);
   const rafRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -96,6 +100,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     return baseText;
   }, [animState.mode, frames, frameRate, text, tick]);
 
+  const colorRendering = useColorRendering(activeText, colorMode, colorVariation, colorVariation === 'seedable' ? colorSeed : '');
 
   const lines = useMemo(() => activeText.split("\n"), [activeText]);
 
@@ -134,6 +139,15 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     const style: React.CSSProperties = {
       transform: `translate(${x}px, ${y}px)`,
     };
+
+    // Apply color rendering background if enabled
+    if (colorMode !== 'none' && colorMode !== 'density-map') {
+      const bgColor = colorRendering.getLineBackgroundColor(i);
+      if (bgColor) {
+        style.backgroundColor = bgColor;
+      }
+    }
+
     if (
       (animState.mode === "colorCycle" || animState.palette === "rainbow") &&
       !animState.gradient
@@ -150,6 +164,15 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
               (animState.targetSet &&
                 new Set(animState.targetSet.split("")).has(ch));
             const cs: React.CSSProperties = {};
+            
+            // Apply color rendering if enabled
+            if (colorMode !== 'none') {
+              const charColor = colorRendering.getCharColor(i, j, ch);
+              if (charColor) {
+                cs.color = charColor;
+              }
+            }
+
             if (isTarget && !animState.gradient) {
               if (animState.palette === "rainbow") {
                 const hue = (t * 60 + i * 20) % 360;
@@ -173,11 +196,23 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     }
     return (
       <div key={i} style={style} className="leading-[1.15]">
-        {line.split('').map((ch, j) => (
-          <span key={j} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
-            {ch}
-          </span>
-        ))}
+        {line.split('').map((ch, j) => {
+          const cs: React.CSSProperties = {};
+          
+          // Apply color rendering if enabled
+          if (colorMode !== 'none') {
+            const charColor = colorRendering.getCharColor(i, j, ch);
+            if (charColor) {
+              cs.color = charColor;
+            }
+          }
+
+          return (
+            <span key={j} style={cs} className={ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? "text-[16px]" : "text-[20px]"}>
+              {ch}
+            </span>
+          );
+        })}
       </div>
     );
   };
@@ -254,6 +289,18 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
     const charH = 20;
     ctx.font = "20px 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', 'Twemoji Mozilla', 'Segoe UI Symbol', 'Symbola', 'Noto Sans', 'Courier New', monospace";
     const t = timeRef.current * 0.002 * animState.speed;
+    
+    // Draw color backgrounds if enabled
+    if (colorMode !== 'none' && colorMode !== 'density-map') {
+      for (let i = 0; i < lines.length; i++) {
+        const bgColor = colorRendering.getLineBackgroundColor(i);
+        if (bgColor) {
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(1, pad + charH * i, c.width - 2, charH);
+        }
+      }
+    }
+    
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const phaseScale = interactive ? 0.5 + pointerXRef.current : 1;
@@ -286,14 +333,23 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
           const isTarget =
             (animState.targetChar && ch === animState.targetChar) ||
             (animState.targetSet && setChars.has(ch));
-          if (isTarget) {
+          
+          // Apply color rendering if enabled
+          if (colorMode !== 'none') {
+            const charColor = colorRendering.getCharColor(i, j, ch);
+            if (charColor) {
+              color = charColor;
+            }
+          }
+          
+          if (isTarget && colorMode === 'none') {
             if (animState.palette === "rainbow") {
               const hue = (t * 60 + i * 20) % 360;
               color = `hsl(${hue}, 90%, 60%)`;
             } else if (animState.palette === "yellow") color = "#f59e0b";
             else if (animState.palette === "green") color = "#22c55e";
             else if (animState.palette === "blue") color = "#3b82f6";
-          } else {
+          } else if (!isTarget && colorMode === 'none') {
             if (animState.palette === "yellow") color = "#a16207";
             else if (animState.palette === "green") color = "#15803d";
             else if (animState.palette === "blue") color = "#1e3a8a";
@@ -304,17 +360,32 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
           ctx.fillText(ch, pad + xOffset + j * charWidth, y);
         }
       } else {
-        if (
-          animState.mode === "colorCycle" ||
-          animState.palette === "rainbow"
-        ) {
-          const hue = (t * 60 + i * 20) % 360;
-          ctx.fillStyle = `hsl(${hue}, 80%, 60%)` as any;
-        } else if (animState.palette === "yellow") ctx.fillStyle = "#a16207";
-        else if (animState.palette === "green") ctx.fillStyle = "#15803d";
-        else if (animState.palette === "blue") ctx.fillStyle = "#1e3a8a";
-        else ctx.fillStyle = "#f4f4f5";
-        ctx.fillText(line, pad + xOffset, y);
+        if (colorMode !== 'none') {
+          // Apply color rendering per character
+          for (let j = 0; j < line.length; j++) {
+            const ch = line[j];
+            const charColor = colorRendering.getCharColor(i, j, ch);
+            if (charColor) {
+              ctx.fillStyle = charColor;
+            } else {
+              ctx.fillStyle = "#f4f4f5";
+            }
+            const charWidth = ch.length > 1 || ch.codePointAt(0)! > 0xFFFF ? 16 : 12;
+            ctx.fillText(ch, pad + xOffset + j * charWidth, y);
+          }
+        } else {
+          if (
+            animState.mode === "colorCycle" ||
+            animState.palette === "rainbow"
+          ) {
+            const hue = (t * 60 + i * 20) % 360;
+            ctx.fillStyle = `hsl(${hue}, 80%, 60%)` as any;
+          } else if (animState.palette === "yellow") ctx.fillStyle = "#a16207";
+          else if (animState.palette === "green") ctx.fillStyle = "#15803d";
+          else if (animState.palette === "blue") ctx.fillStyle = "#1e3a8a";
+          else ctx.fillStyle = "#f4f4f5";
+          ctx.fillText(line, pad + xOffset, y);
+        }
       }
     }
   }, [
@@ -710,6 +781,96 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Color Rendering Engine */}
+      <div className="mt-6 pixel-border rounded-lg bg-card">
+        <div className="px-4 py-3 border-b border-border text-center">
+          <h3 className="font-mono text-sm font-bold text-yellow-700 dark:text-yellow-500">
+            🎨 COLOR RENDERING ENGINE
+          </h3>
+          <p className="font-mono text-xs text-foreground/70 mt-1">
+            Monochrome & negative space interpretation of ASCII designs
+          </p>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="flex flex-wrap gap-2 items-center justify-center">
+            <label className="font-mono text-xs">mode</label>
+            <select
+              value={colorMode}
+              onChange={(e) => setColorMode(e.target.value as ColorRenderMode)}
+              className="font-mono text-xs px-2 py-1 border rounded"
+              title="Color rendering mode for ASCII art patches"
+            >
+              <option value="none">{getColorModeLabel('none')}</option>
+              <option value="monochrome">{getColorModeLabel('monochrome')}</option>
+              <option value="negative-space">{getColorModeLabel('negative-space')}</option>
+              <option value="density-map">{getColorModeLabel('density-map')}</option>
+            </select>
+          </div>
+
+          {colorMode !== 'none' && (
+            <>
+              <div className="flex flex-wrap gap-2 items-center justify-center">
+                <label className="font-mono text-xs">variation</label>
+                <select
+                  value={colorVariation}
+                  onChange={(e) => setColorVariation(e.target.value as ColorVariation)}
+                  className="font-mono text-xs px-2 py-1 border rounded"
+                >
+                  <option value="deterministic">deterministic</option>
+                  <option value="seedable">seedable</option>
+                </select>
+              </div>
+
+              {colorVariation === 'seedable' && (
+                <div className="flex flex-wrap gap-2 items-center justify-center">
+                  <label className="font-mono text-xs">seed</label>
+                  <input
+                    type="text"
+                    value={colorSeed}
+                    onChange={(e) => setColorSeed(e.target.value)}
+                    className="font-mono text-xs px-2 py-1 border rounded flex-1 max-w-xs"
+                    placeholder="Color seed"
+                  />
+                  <button
+                    onClick={() => setColorSeed(`${pantId}-${Math.random().toString(36).slice(2, 9)}`)}
+                    className="font-mono text-xs px-2 py-1 border rounded"
+                    title="Generate random color seed"
+                  >
+                    🔀
+                  </button>
+                </div>
+              )}
+
+              <div className="pt-2 border-t border-border/50 text-xs text-foreground/60 space-y-1 font-mono">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-foreground/50">Regions:</span>
+                    <div>{colorRendering.regions.length}</div>
+                  </div>
+                  <div>
+                    <span className="text-foreground/50">Density Range:</span>
+                    <div>
+                      {colorRendering.lineDensities.length > 0 
+                        ? `${Math.min(...colorRendering.lineDensities).toFixed(0)}-${Math.max(...colorRendering.lineDensities).toFixed(0)}%`
+                        : 'N/A'
+                      }
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-foreground/50">Threshold:</span>
+                    <div>{colorRendering.densityThreshold.toFixed(1)}%</div>
+                  </div>
+                  <div>
+                    <span className="text-foreground/50">Variation:</span>
+                    <div>{colorRendering.variation}</div>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

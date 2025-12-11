@@ -4,6 +4,9 @@ export interface AsciiGenerationParams {
   variation?: 'subtle' | 'moderate' | 'dramatic'
   complexity?: number // 1-10 scale for additional elements
   preserveTheme?: boolean // Stay true to original theme
+  colorMode?: 'brightness' | 'shadow' | 'tone-map' | 'contour' | 'none' // Color-aware rendering
+  colorIntensity?: number // 0-100
+  shadowDepth?: number // 0-100
 }
 
 export interface GeneratedAscii {
@@ -15,6 +18,8 @@ export interface GeneratedAscii {
     complexity: number
     changes: number
     themePreservation: number
+    colorMode?: string
+    colorIntensity?: number
   }
 }
 
@@ -238,6 +243,9 @@ export class AsciiGenerator {
   private variation: string
   private complexity: number
   private preserveTheme: boolean
+  private colorMode: string
+  private colorIntensity: number
+  private shadowDepth: number
 
   constructor(params: AsciiGenerationParams) {
     this.seed = params.seed
@@ -245,6 +253,9 @@ export class AsciiGenerator {
     this.variation = params.variation || 'subtle'
     this.complexity = params.complexity || 3
     this.preserveTheme = params.preserveTheme !== false
+    this.colorMode = params.colorMode || 'none'
+    this.colorIntensity = params.colorIntensity ?? 50
+    this.shadowDepth = params.shadowDepth ?? 50
   }
 
   /**
@@ -279,7 +290,12 @@ export class AsciiGenerator {
     const modifiedGrid = this.createVariation(baseGrid, template)
     
     // Convert back to ASCII
-    const art = this.gridToAscii(modifiedGrid)
+    let art = this.gridToAscii(modifiedGrid)
+    
+    // Apply color-aware rendering if enabled
+    if (this.colorMode !== 'none') {
+      art = this.applyColorAwareRendering(art)
+    }
     
     // Calculate theme preservation score
     const preservationScore = this.calculateThemePreservation(baseGrid, modifiedGrid, template)
@@ -292,7 +308,9 @@ export class AsciiGenerator {
         variation: this.variation,
         complexity: this.complexity,
         changes: this.countChanges(baseGrid, modifiedGrid),
-        themePreservation: preservationScore
+        themePreservation: preservationScore,
+        colorMode: this.colorMode,
+        colorIntensity: this.colorIntensity
       }
     }
   }
@@ -767,6 +785,114 @@ export class AsciiGenerator {
     }
     
     return changes
+  }
+
+  /**
+   * Apply color-aware ASCII rendering to alter characters based on tone/shadow
+   */
+  private applyColorAwareRendering(art: string): string {
+    const lines = art.split('\n')
+    const ramp = this.selectColorRamp()
+    
+    return lines.map((line, lineIndex) => {
+      return line.split('').map((char, charIndex) => {
+        if (char === ' ') return char
+        
+        const originalBrightness = this.getCharBrightness(char)
+        let targetBrightness = originalBrightness
+        
+        if (this.colorMode === 'brightness') {
+          targetBrightness = this.applyBrightnessMode(line, originalBrightness)
+        } else if (this.colorMode === 'shadow') {
+          targetBrightness = this.applyShadowMode(line, charIndex, originalBrightness)
+        } else if (this.colorMode === 'tone-map') {
+          targetBrightness = this.applyToneMapMode(line, lineIndex, originalBrightness)
+        } else if (this.colorMode === 'contour') {
+          targetBrightness = this.applyContourMode(lines, lineIndex, charIndex, originalBrightness)
+        }
+        
+        const rampIndex = Math.round((targetBrightness / 100) * (ramp.length - 1))
+        const clampedIndex = Math.max(0, Math.min(ramp.length - 1, rampIndex))
+        return ramp[clampedIndex]
+      }).join('')
+    }).join('\n')
+  }
+
+  private selectColorRamp(): string[] {
+    // Select ramp based on theme and complexity
+    const theme = this.baseDesign.includes('moon') ? 'lunar' : 'standard'
+    
+    if (theme === 'lunar') {
+      return [' ', '.', 'o', 'O', '0', 'Q', '@', '#']
+    }
+    
+    if (this.complexity > 6) {
+      return [' ', '.', '`', "'", '^', '-', '_', '~', ':', '!', '|', '/', '\\', 'c', 'C', 'x', 'X', 'S', '@', '#', '%', '&']
+    }
+    
+    return [' ', '.', ',', ':', ';', 'c', 'i', 'l', '1', '!', 'L', 'I', 'o', 'O', '0', '@', '#']
+  }
+
+  private getCharBrightness(char: string): number {
+    const brightnessMap: Record<string, number> = {
+      ' ': 0, '.': 5, ',': 5, '`': 5, "'": 5, '^': 10, '_': 10,
+      '-': 15, '~': 20, ':': 25, ';': 25, '!': 30, '|': 35, '/': 40,
+      '\\': 40, 'c': 45, 'l': 45, '1': 45, 'i': 45, 'o': 60, 'O': 70,
+      '0': 75, 'C': 50, 'L': 50, 'I': 50, 'x': 55, 'X': 65, 'S': 65,
+      'Q': 80, '@': 90, '#': 95, '%': 85, '&': 88,
+    }
+    return brightnessMap[char] ?? 50
+  }
+
+  private calculateLineBrightness(line: string): number {
+    if (line.length === 0) return 0
+    const nonSpace = line.split('').filter(c => c !== ' ').length
+    return (nonSpace / line.length) * 100
+  }
+
+  private applyBrightnessMode(line: string, originalBrightness: number): number {
+    const lineBrightness = this.calculateLineBrightness(line)
+    const variation = (lineBrightness / 100) * this.colorIntensity
+    return Math.min(100, originalBrightness + (variation * 0.5))
+  }
+
+  private applyShadowMode(line: string, charIndex: number, originalBrightness: number): number {
+    const leftIsSpace = charIndex === 0 || line[charIndex - 1] === ' '
+    const rightIsSpace = charIndex === line.length - 1 || line[charIndex + 1] === ' '
+    const isEdge = leftIsSpace || rightIsSpace
+    
+    if (isEdge) {
+      const shadowReduction = (this.shadowDepth / 100) * this.colorIntensity
+      return Math.max(0, originalBrightness - shadowReduction * 30)
+    }
+    
+    return originalBrightness
+  }
+
+  private applyToneMapMode(line: string, lineIndex: number, originalBrightness: number): number {
+    const lineBrightness = this.calculateLineBrightness(line)
+    const seedVariation = this.seededRandom(lineIndex) * 20 - 10
+    
+    const mapped = (lineBrightness / 100) * 100
+    const adjustment = (mapped - 50) * (this.colorIntensity / 100) * 0.4
+    
+    return Math.max(0, Math.min(100, 50 + adjustment + seedVariation))
+  }
+
+  private applyContourMode(lines: string[], lineIndex: number, charIndex: number, originalBrightness: number): number {
+    const currentDensity = this.calculateLineBrightness(lines[lineIndex])
+    const prevDensity = lineIndex > 0 ? this.calculateLineBrightness(lines[lineIndex - 1]) : currentDensity
+    const nextDensity = lineIndex < lines.length - 1 ? this.calculateLineBrightness(lines[lineIndex + 1]) : currentDensity
+    
+    const densityChange = Math.abs(currentDensity - prevDensity) + Math.abs(currentDensity - nextDensity)
+    
+    if (densityChange > 20) {
+      const edgeBoost = (densityChange / 40) * this.colorIntensity
+      return Math.min(100, originalBrightness + edgeBoost * 0.5)
+    }
+    
+    const baseTarget = (currentDensity / 100) * 100
+    return Math.max(0, Math.min(100, baseTarget))
   }
 
   /**

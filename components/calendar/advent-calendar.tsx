@@ -32,8 +32,8 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
   // In development, allow all days
   const availableDays = isDevelopment ? 24 : (currentMonth === 11 ? Math.min(currentDayOfMonth, 24) : 0)
 
-  // Generate the 12 days advent calendar (days 13-24 for Christmas countdown)
-  const adventDays = Array.from({ length: 12 }, (_, i) => i + 13)
+  // Mint campaign starts on the 19th (six days: 19–24)
+  const adventDays = Array.from({ length: 6 }, (_, i) => i + 19)
 
   const handleDayClick = (day: number) => {
     if (day <= availableDays) {
@@ -90,18 +90,27 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
     24: { emoji: '🌙', hint: 'Finale celebration' }
   }
 
-  const getArtForDay = (day: number): ArtPiece | null => {
+  const getMintCount = (day: number): number => {
+    return day >= 19 ? 2 : 1
+  }
+
+  const getArtForDay = (day: number, mintIndex: number = 0): ArtPiece | null => {
     if (!artPieces.length) return null
-    const index = dayToArtMap[day] ?? day % artPieces.length
+    const baseIndex = dayToArtMap[day] ?? day % artPieces.length
+    const index = (baseIndex + (day >= 19 ? mintIndex : 0)) % artPieces.length
     return artPieces[index]
   }
 
-  const selectedArt = selectedDay ? getArtForDay(selectedDay) : null
+  const selectedArtPrimary = selectedDay ? getArtForDay(selectedDay, 0) : null
+  const selectedArtSecondary = selectedDay && getMintCount(selectedDay) > 1 ? getArtForDay(selectedDay, 1) : null
   
   // Debug logging in development
   if (typeof window !== 'undefined' && isDevelopment) {
-    if (selectedDay && !selectedArt) {
-      console.warn(`No art found for day ${selectedDay}. Art pieces available:`, artPieces.length)
+    if (selectedDay && !selectedArtPrimary) {
+      console.warn(`No primary art found for day ${selectedDay}. Art pieces available:`, artPieces.length)
+    }
+    if (selectedDay && getMintCount(selectedDay) > 1 && !selectedArtSecondary) {
+      console.warn(`No secondary art found for day ${selectedDay}. Art pieces available:`, artPieces.length)
     }
   }
 
@@ -168,7 +177,7 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
                 <button
                   onClick={() => handleDayClick(day)}
                   disabled={!isUnlocked}
-                  className={`w-full aspect-square flex flex-col items-center justify-center rounded border-2 transition-all duration-200 font-mono text-sm font-bold
+                  className={`relative w-full aspect-square flex flex-col items-center justify-center rounded border-2 transition-all duration-200 font-mono text-sm font-bold
                     ${isUnlocked
                       ? isToday
                         ? 'border-yellow-500 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-500/30'
@@ -181,6 +190,12 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
                     }
                   `}
                 >
+                  {/* Badge for two mints starting Day 19 */}
+                  {day >= 19 && (
+                    <div className="absolute top-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-yellow-600 text-white">
+                      ×2
+                    </div>
+                  )}
                   <div className="text-xs opacity-75">DAY</div>
                   <div className="text-lg leading-tight">{day}</div>
                   {isUnlockedButNotSelected && <div className="text-xs mt-0.5">✓</div>}
@@ -203,9 +218,9 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
       </div>
 
       {/* Modal for selected day */}
-      {selectedDay && selectedArt && (
+      {selectedDay && selectedArtPrimary && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-card border-2 border-yellow-600/50 rounded-lg p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-auto relative shadow-xl">
+          <div className="bg-card border-2 border-yellow-600/50 rounded-lg p-6 md:p-8 max-w-3xl w-full max-h-[90vh] overflow-auto relative shadow-xl">
             <button
               onClick={handleCloseModal}
               className="absolute top-4 right-4 text-yellow-600 hover:text-yellow-500 transition-colors"
@@ -218,11 +233,8 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
 
             <div className="text-center mb-6 space-y-3">
               <div className="font-mono text-sm text-yellow-600 dark:text-yellow-500 font-bold">
-                🎄 DAY {selectedDay} UNLOCKED 🎄
+                🎄 DAY {selectedDay} UNLOCKED {getMintCount(selectedDay) > 1 ? '• 2 Mints Today' : ''} 🎄
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-yellow-700 dark:text-yellow-500">
-                {selectedArt.name}
-              </h2>
               <div className="font-mono text-xs text-yellow-600/70 dark:text-yellow-600">
                 {currentDate.toLocaleDateString('en-US', {
                   weekday: 'short',
@@ -230,33 +242,70 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
                   day: 'numeric'
                 })}
               </div>
+            </div>
 
-              <div className="border-t border-yellow-600/30 pt-4">
-                <div className={`text-sm font-mono font-bold ${getRarityColor(selectedArt.rarity)}`}>
-                  {selectedArt.rarity.toUpperCase()}
+            <div className={`grid ${getMintCount(selectedDay) > 1 ? 'md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
+              {/* Primary Mint Panel */}
+              <div className="border-2 border-yellow-600/30 rounded-lg p-4">
+                <div className="mb-2">
+                  <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-600/20 text-yellow-700 dark:text-yellow-400 border border-yellow-600/40">Drop A</span>
+                </div>
+                <h2 className="text-xl md:text-2xl font-bold text-yellow-700 dark:text-yellow-500 mb-2">
+                  {selectedArtPrimary.name}
+                </h2>
+                <div className={`text-sm font-mono font-bold ${getRarityColor(selectedArtPrimary.rarity)} mb-4`}>
+                  {selectedArtPrimary.rarity.toUpperCase()}
+                </div>
+                <div className="text-center mb-4">
+                  <div className="ascii-art-full font-mono text-foreground whitespace-pre overflow-auto p-4 bg-background/50 border border-yellow-600/20 rounded text-xs md:text-sm max-h-64 inline-block w-full">
+                    {selectedArtPrimary.content}
+                  </div>
+                </div>
+                <div className="space-y-2 text-center">
+                  <p className="text-sm text-foreground">{selectedArtPrimary.description}</p>
+                  <div className="text-xs text-foreground/70 space-y-1 font-mono">
+                    <p>Moonynad #{selectedArtPrimary.id.toUpperCase()}</p>
+                    <p>Limited Edition Christmas Drop • {currentDate.getFullYear()}</p>
+                  </div>
+                  <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded text-center">
+                    <p className="font-mono text-xs text-yellow-600 dark:text-yellow-400">
+                      🚀 NFT Minting Coming Soon!
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="text-center mb-6">
-              <div className="ascii-art-full font-mono text-foreground whitespace-pre overflow-auto p-4 bg-background/50 border border-yellow-600/20 rounded text-xs md:text-sm max-h-64 inline-block">
-                {selectedArt.content}
-              </div>
-            </div>
-
-            <div className="border-t border-yellow-600/30 pt-4 space-y-3 text-center">
-              <p className="text-sm text-foreground">{selectedArt.description}</p>
-              <div className="text-xs text-foreground/70 space-y-1 font-mono">
-                <p>Moonynad #{selectedArt.id.toUpperCase()}</p>
-                <p>Limited Edition Christmas Drop • {currentDate.getFullYear()}</p>
-              </div>
-              
-              {/* Minting Coming Soon */}
-              <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded text-center">
-                <p className="font-mono text-xs text-yellow-600 dark:text-yellow-400">
-                  🚀 NFT Minting Coming Soon!
-                </p>
-              </div>
+              {/* Secondary Mint Panel */}
+              {getMintCount(selectedDay) > 1 && selectedArtSecondary && (
+                <div className="border-2 border-yellow-600/30 rounded-lg p-4">
+                  <div className="mb-2">
+                    <span className="inline-block text-[10px] font-mono px-2 py-0.5 rounded bg-yellow-600/20 text-yellow-700 dark:text-yellow-400 border border-yellow-600/40">Drop B</span>
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-bold text-yellow-700 dark:text-yellow-500 mb-2">
+                    {selectedArtSecondary.name}
+                  </h2>
+                  <div className={`text-sm font-mono font-bold ${getRarityColor(selectedArtSecondary.rarity)} mb-4`}>
+                    {selectedArtSecondary.rarity.toUpperCase()}
+                  </div>
+                  <div className="text-center mb-4">
+                    <div className="ascii-art-full font-mono text-foreground whitespace-pre overflow-auto p-4 bg-background/50 border border-yellow-600/20 rounded text-xs md:text-sm max-h-64 inline-block w-full">
+                      {selectedArtSecondary.content}
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-center">
+                    <p className="text-sm text-foreground">{selectedArtSecondary.description}</p>
+                    <div className="text-xs text-foreground/70 space-y-1 font-mono">
+                      <p>Moonynad #{selectedArtSecondary.id.toUpperCase()}</p>
+                      <p>Limited Edition Christmas Drop • {currentDate.getFullYear()}</p>
+                    </div>
+                    <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded text-center">
+                      <p className="font-mono text-xs text-yellow-600 dark:text-yellow-400">
+                        🚀 NFT Minting Coming Soon!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

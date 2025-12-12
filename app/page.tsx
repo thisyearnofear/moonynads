@@ -96,39 +96,11 @@ export default function Home() {
             rarity: "uncommon",
           },
           {
-            id: "hips",
-            name: "Moon Hips",
-            filename: "hips.txt",
-            description: "Curvaceous lunar landscape",
-            rarity: "rare",
-          },
-          {
-            id: "l",
-            name: "Lunar L",
-            filename: "l.txt",
-            description: "Abstract moon in the shape of letter L",
-            rarity: "common",
-          },
-          {
-            id: "m",
-            name: "Lunar M",
-            filename: "m.txt",
-            description: "Dual moon formation resembling letter M",
-            rarity: "common",
-          },
-          {
             id: "multi",
             name: "Multi-Moon",
             filename: "multi.txt",
             description: "A constellation of multiple moons",
             rarity: "uncommon",
-          },
-          {
-            id: "s",
-            name: "Lunar S",
-            filename: "s.txt",
-            description: "Crescent moon forming an S shape",
-            rarity: "rare",
           },
           {
             id: "xl",
@@ -246,7 +218,7 @@ export default function Home() {
               🎄 {Math.ceil(daysUntilChristmas)} days until Christmas! 🎄
             </p>
             <p className="font-mono text-xs text-foreground/60">
-              Unlock special moon art with our 12 Days of Moonynads Advent
+              Unlock special moon art with our 6 Days of M00nynads Advent
               Calendar
             </p>
           </div>
@@ -256,7 +228,7 @@ export default function Home() {
         {isChristmasSeason && (
           <section className="mb-12">
             <h2 className="text-xl md:text-2xl font-bold text-center mb-8 text-yellow-700 dark:text-yellow-500 font-mono">
-              12 DAYS OF MOONYNADS
+              6 DAYS OF M00NYNADS
             </h2>
             <AdventCalendar
               artPieces={artPieces}

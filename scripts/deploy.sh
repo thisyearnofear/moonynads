@@ -130,12 +130,8 @@ export const MOONYNAD_TOKEN_IDS = {
   lady: 5,
   chudnovsky: 6,
   headupbutt: 7,
-  hips: 8,
-  l: 9,
-  m: 10,
-  multi: 11,
-  s: 12,
-  xl: 13
+  multi: 8,
+  xl: 9
 } as const
 
 export const RARITY_CONFIG = {

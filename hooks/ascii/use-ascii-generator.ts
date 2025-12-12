@@ -174,11 +174,7 @@ function getPantName(pantId: string): string {
     'lady': 'Moon Lady',
     'chudnovsky': 'Chudnovsky Moon',
     'headupbutt': 'Lunar Butt',
-    'hips': 'Moon Hips',
-    'l': 'Lunar L',
-    'm': 'Lunar M',
     'multi': 'Multi-Moon',
-    's': 'Lunar S',
     'xl': 'XL Moon'
   }
   return nameMap[pantId] || 'Unknown Pant'
@@ -193,11 +189,7 @@ function getPantRarity(pantId: string): string {
     'lady': 'epic',
     'chudnovsky': 'legendary',
     'headupbutt': 'uncommon',
-    'hips': 'rare',
-    'l': 'common',
-    'm': 'common',
     'multi': 'uncommon',
-    's': 'rare',
     'xl': 'epic'
   }
   return rarityMap[pantId] || 'common'
@@ -212,11 +204,7 @@ function getPantDescription(pantId: string): string {
     'lady': 'Mystical lunar goddess with flowing robes',
     'chudnovsky': 'Complex mathematical moon pattern',
     'headupbutt': 'A cheeky moon with a playful twist',
-    'hips': 'Curvaceous lunar landscape',
-    'l': 'Abstract moon in the shape of letter L',
-    'm': 'Dual moon formation resembling letter M',
     'multi': 'A constellation of multiple moons',
-    's': 'Crescent moon forming an S shape',
     'xl': 'Extra large lunar display'
   }
   return descMap[pantId] || 'A unique ASCII art piece'

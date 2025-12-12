@@ -365,7 +365,7 @@ export function ASCIIAnimator({ src, pantId }: ASCIIAnimatorProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "hips-snapshot.png";
+      a.download = "moonynad-snapshot.png";
       a.click();
       URL.revokeObjectURL(url);
     }, "image/png");

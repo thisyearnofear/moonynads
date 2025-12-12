@@ -88,7 +88,7 @@ export const CONFIG = {
 export function getTokenId(artId: string): number {
   const mapping: Record<string, number> = {
     moon: 1, moon2: 2, moon3: 3, heart: 4, lady: 5, chudnovsky: 6,
-    headupbutt: 7, hips: 8, l: 9, m: 10, multi: 11, s: 12, xl: 13
+    headupbutt: 7, multi: 8, xl: 9
   }
   return mapping[artId] || 0
 }

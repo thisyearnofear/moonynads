@@ -12,7 +12,7 @@ export default async function PantsLab({
   params: Promise<{ id: string }>;
 }) {
   const p = await params;
-  const id: PantId = isPantId(p.id) ? p.id : "hips";
+  const id: PantId = isPantId(p.id) ? p.id : "moon";
   const src = `/pants/${id}.txt`;
   return (
     <main className="min-h-screen bg-background">

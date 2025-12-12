@@ -32,7 +32,7 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
   // In development, allow all days
   const availableDays = isDevelopment ? 24 : (currentMonth === 11 ? Math.min(currentDayOfMonth, 24) : 0)
 
-  // Mint campaign starts on the 19th (six days: 19–24)
+  // Mint campaign starts on the 19th (six days: 19–24, first 3 single, last 3 double)
   const adventDays = Array.from({ length: 6 }, (_, i) => i + 19)
 
   const handleDayClick = (day: number) => {
@@ -60,38 +60,26 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
 
   // Map days to specific art pieces
   const dayToArtMap: Record<number, number> = {
-    13: 0,   // moon
-    14: 1,   // moon2
-    15: 2,   // moon3
-    16: 3,   // heart
-    17: 4,   // lady
-    18: 5,   // chudnovsky
-    19: 6,   // headupbutt
-    20: 7,   // hips
-    21: 8,   // l
-    22: 9,   // m
-    23: 10,  // multi
-    24: 11   // s
+    19: 0,   // moon
+    20: 1,   // moon2
+    21: 2,   // moon3
+    22: 3,   // heart
+    23: 5,   // chudnovsky
+    24: 7    // multi
   }
 
   // Subtle mechanics hints for each day
   const dayMechanicsHints: Record<number, { emoji: string; hint: string }> = {
-    13: { emoji: '⚡', hint: 'First come, first served' },
-    14: { emoji: '📉', hint: 'Price discovery mode' },
-    15: { emoji: '🎰', hint: 'Randomness awaits' },
-    16: { emoji: '🎮', hint: 'Leaderboard mechanics' },
-    17: { emoji: '📱', hint: 'Social engagement bonus' },
-    18: { emoji: '🏆', hint: 'Competitive bidding' },
-    19: { emoji: '🤝', hint: 'Community challenge' },
-    20: { emoji: '⭐', hint: 'Creator recognition' },
-    21: { emoji: '💎', hint: 'Exclusive tier' },
-    22: { emoji: '🎁', hint: 'Mystery revealed' },
-    23: { emoji: '🌊', hint: 'Unlimited opportunity' },
-    24: { emoji: '🌙', hint: 'Finale celebration' }
+    19: { emoji: '🌙', hint: 'Classic moon begins' },
+    20: { emoji: '🌕', hint: 'Detailed craters revealed' },
+    21: { emoji: '🌖', hint: 'Geometric precision' },
+    22: { emoji: '💝', hint: 'Romantic lunar heart' },
+    23: { emoji: '🧠', hint: 'Mathematical masterpiece' },
+    24: { emoji: '🌌', hint: 'Cosmic constellation' }
   }
 
   const getMintCount = (day: number): number => {
-    return day >= 19 ? 2 : 1
+    return day >= 22 ? 2 : 1
   }
 
   const getArtForDay = (day: number, mintIndex: number = 0): ArtPiece | null => {
@@ -190,8 +178,8 @@ export default function AdventCalendar({ artPieces, currentDate, onModalStateCha
                     }
                   `}
                 >
-                  {/* Badge for two mints starting Day 19 */}
-                  {day >= 19 && (
+                  {/* Badge for two mints starting Day 22 */}
+                  {day >= 22 && (
                     <div className="absolute top-1 right-1 text-[10px] px-1.5 py-0.5 rounded bg-yellow-600 text-white">
                       ×2
                     </div>

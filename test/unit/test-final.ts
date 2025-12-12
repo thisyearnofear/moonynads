@@ -1,6 +1,6 @@
 import { generateAsciiArt } from '@/lib/ascii-generator'
 
-const baseDesigns = ['moon', 'moon2', 'moon3', 'heart', 'lady', 'chudnovsky', 'headupbutt', 'hips', 'l', 'm', 'multi', 's', 'xl']
+const baseDesigns = ['moon', 'moon2', 'moon3', 'heart', 'lady', 'chudnovsky', 'headupbutt', 'multi', 'xl']
 const variations: ('subtle' | 'moderate' | 'dramatic')[] = ['subtle', 'moderate', 'dramatic']
 
 async function runFinalTests() {

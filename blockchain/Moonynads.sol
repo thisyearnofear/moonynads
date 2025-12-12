@@ -71,8 +71,6 @@ contract Moonynads is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Pausable
         adventDayToTokenId[17] = 5;  // lady
         adventDayToTokenId[18] = 6;  // chudnovsky
         adventDayToTokenId[19] = 7;  // headupbutt
-        adventDayToTokenId[20] = 8;  // hips
-        adventDayToTokenId[21] = 9;  // l
         adventDayToTokenId[22] = 10; // m
         adventDayToTokenId[23] = 11; // multi
         adventDayToTokenId[24] = 12; // s
